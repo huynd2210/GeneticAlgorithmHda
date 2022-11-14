@@ -23,11 +23,6 @@ public class Main {
   }
 
   public static void main(String[] args) {
-//    Protein protein = new Protein(Examples.SEQ20);
-//    Folding folding = new Folding("NNNNNNNNNNNNNNNNNNN");
-//    HPModel hpModel = new HPModel(protein, folding);
-//    Logic.fold(hpModel);
-//    System.out.println(hpModel);
 //    testNoOverlapping();
     testOverlapping();
   }

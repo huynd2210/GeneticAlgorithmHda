@@ -17,17 +17,21 @@ public class Logic {
   public static double getFitness(HPModel foldedModel) {
     double fitness = 1;
     int numberOfHHBonds = 0;
-    List<AminoAcid> hydrophobicAminoAcids = filterOverlappingAminoAcids(filterForHydrophobicAcids(foldedModel));
-
+    List<AminoAcid> hydrophobicAminoAcids = (filterForHydrophobicAcids(foldedModel));
+    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+    System.out.println("Number of overlapping amino acids: " + overlappingAminoAcids.size());
+    System.out.println("Overlapping amino acids: " + overlappingAminoAcids);
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
-        numberOfHHBonds++;
         if (isValidForEnergyCount(hydrophobicAminoAcids.get(i), hydrophobicAminoAcids.get(j))) {
-          fitness += 1;
+          numberOfHHBonds += 1;
         }
       }
     }
     System.out.println("Number of HH bonds: " + numberOfHHBonds);
+
+    fitness = fitness + ((double) numberOfHHBonds / (overlappingAminoAcids.size() + 1));
+
     return fitness;
   }
 
@@ -77,22 +81,19 @@ public class Logic {
     return hydrophobicAminoAcids;
   }
 
-  private static List<AminoAcid> filterOverlappingAminoAcids(List<AminoAcid> hydrophobicAminoAcids) {
-    List<AminoAcid> filteredAminoAcids = new ArrayList<>();
+  private static List<AminoAcid> filterForOverlappingAminoAcids(List<AminoAcid> hydrophobicAminoAcids) {
+    List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
     Set<Integer> positionsHashes = new HashSet<>();
-    int numberOfOverlappings = 0;
     for (AminoAcid hydrophobicAminoAcid : hydrophobicAminoAcids) {
       int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
       if (!positionsHashes.contains(positionHash)) {
         positionsHashes.add(positionHash);
-        filteredAminoAcids.add(hydrophobicAminoAcid);
       } else {
-        numberOfOverlappings++;
+        overlappingAminoAcids.add(hydrophobicAminoAcid);
         hydrophobicAminoAcid.setOverlapping(true);
       }
     }
-    System.out.println("Number of overlapping amino acids: " + numberOfOverlappings);
-    return filteredAminoAcids;
+    return overlappingAminoAcids;
   }
 
   private static Integer hashPosition(Integer[] position) {
