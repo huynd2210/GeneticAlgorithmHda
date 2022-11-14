@@ -28,7 +28,7 @@ public class Main {
 //    HPModel hpModel = new HPModel(protein, folding);
 //    Logic.fold(hpModel);
 //    System.out.println(hpModel);
-    testNoOverlapping();
+//    testNoOverlapping();
     testOverlapping();
   }
 }

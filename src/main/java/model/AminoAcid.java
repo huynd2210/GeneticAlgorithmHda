@@ -1,7 +1,5 @@
 package model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,4 +39,6 @@ public class AminoAcid {
             ", position=" + Arrays.toString(position) +
             '}';
   }
+
+
 }

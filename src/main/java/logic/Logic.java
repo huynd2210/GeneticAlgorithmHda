@@ -5,34 +5,33 @@ import model.Folding;
 import model.HPModel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class Logic {
   private Logic() {
   }
 
-  public static double getFitness(HPModel foldedModel){
+  public static double getFitness(HPModel foldedModel) {
     double fitness = 1;
-    List<AminoAcid> hydrophobicAminoAcids = new ArrayList<>();
-
-    for (int i = 0; i < foldedModel.getProtein().getProteinChain().size(); i++) {
-      if (foldedModel.getProtein().getProteinChain().get(i).isHydrophob()){
-        hydrophobicAminoAcids.add(foldedModel.getProtein().getProteinChain().get(i));
-      }
-    }
+    int numberOfHHBonds = 0;
+    List<AminoAcid> hydrophobicAminoAcids = filterOverlappingAminoAcids(filterForHydrophobicAcids(foldedModel));
 
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
+        numberOfHHBonds++;
         if (isValidForEnergyCount(hydrophobicAminoAcids.get(i), hydrophobicAminoAcids.get(j))) {
           fitness += 1;
         }
       }
     }
+    System.out.println("Number of HH bonds: " + numberOfHHBonds);
     return fitness;
   }
 
-  public static void fold(HPModel hpModel){
+  public static void fold(HPModel hpModel) {
     Folding folding = hpModel.getFolding();
     //set first index of the amino acid chain
     hpModel.getProtein().getProteinChain().get(0).setIndex(0);
@@ -46,27 +45,62 @@ public class Logic {
     }
   }
 
-  private static boolean isValidForEnergyCount(AminoAcid first, AminoAcid second){
+  private static boolean isValidForEnergyCount(AminoAcid first, AminoAcid second) {
     boolean isAdjacent = isAdjacent(first, second);
     boolean isNeighbor = Math.abs(first.getIndex() - second.getIndex()) == 1;
 
     boolean valid = isAdjacent && !isNeighbor;
-    if (valid){
+    if (valid) {
       System.out.println("Valid pair for fitness score: " + first + " and " + second);
     }
 
     return valid;
   }
 
-  private static int manhattanDistance(Integer[] first, Integer[] second){
+  private static int manhattanDistance(Integer[] first, Integer[] second) {
     return Math.abs(first[0] - second[0]) + Math.abs(first[1] - second[1]);
   }
 
-  private static boolean isAdjacent(AminoAcid first, AminoAcid second){
+  private static boolean isAdjacent(AminoAcid first, AminoAcid second) {
     return manhattanDistance(first.getPosition(), second.getPosition()) == 1;
   }
 
-  private static Integer[] move(char direction, Integer[] position){
+  private static List<AminoAcid> filterForHydrophobicAcids(HPModel foldedModel) {
+    List<AminoAcid> hydrophobicAminoAcids = new ArrayList<>();
+
+    for (int i = 0; i < foldedModel.getProtein().getProteinChain().size(); i++) {
+      if (foldedModel.getProtein().getProteinChain().get(i).isHydrophob()) {
+        hydrophobicAminoAcids.add(foldedModel.getProtein().getProteinChain().get(i));
+      }
+    }
+
+    return hydrophobicAminoAcids;
+  }
+
+  private static List<AminoAcid> filterOverlappingAminoAcids(List<AminoAcid> hydrophobicAminoAcids) {
+    List<AminoAcid> filteredAminoAcids = new ArrayList<>();
+    Set<Integer> positionsHashes = new HashSet<>();
+    int numberOfOverlappings = 0;
+    for (AminoAcid hydrophobicAminoAcid : hydrophobicAminoAcids) {
+      int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
+      if (!positionsHashes.contains(positionHash)) {
+        positionsHashes.add(positionHash);
+        filteredAminoAcids.add(hydrophobicAminoAcid);
+      } else {
+        numberOfOverlappings++;
+        hydrophobicAminoAcid.setOverlapping(true);
+      }
+    }
+    System.out.println("Number of overlapping amino acids: " + numberOfOverlappings);
+    return filteredAminoAcids;
+  }
+
+  private static Integer hashPosition(Integer[] position) {
+    int prime = 31;
+    return position[0] * prime + position[1];
+  }
+
+  private static Integer[] move(char direction, Integer[] position) {
     Integer[] tmp = new Integer[]{position[0], position[1]};
     switch (direction) {
       case 'N':
