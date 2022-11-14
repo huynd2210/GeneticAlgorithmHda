@@ -16,20 +16,27 @@ public class AminoAcid {
   //i,j position, with the first amino acid being at position (0,0)
   private Integer[] position;
 
+  private int index;
+
+  private boolean isOverlapping;
+
   public AminoAcid(boolean isHydrophob) {
     this.isHydrophob = isHydrophob;
     this.position = new Integer[]{0, 0};
+    this.isOverlapping = false;
   }
 
   public AminoAcid(char type) {
     this.isHydrophob = type == '1';
     this.position = new Integer[]{0, 0};
+    this.isOverlapping = false;
   }
 
   @Override
   public String toString() {
-    char type = isHydrophob ? '1' : '0';
+    String type = isHydrophob ? "hydrophob" : "hydrophil";
     return "AminoAcid{" +
+            "index=" + index + ", " +
             type +
             ", position=" + Arrays.toString(position) +
             '}';

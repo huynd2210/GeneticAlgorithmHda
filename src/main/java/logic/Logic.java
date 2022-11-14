@@ -13,46 +13,49 @@ public class Logic {
   }
 
   public static double getFitness(HPModel foldedModel){
-    double fitness = 0;
+    double fitness = 1;
+    List<AminoAcid> hydrophobicAminoAcids = new ArrayList<>();
 
-    List<Pair> indexAminoAcids = new ArrayList<>();
     for (int i = 0; i < foldedModel.getProtein().getProteinChain().size(); i++) {
       if (foldedModel.getProtein().getProteinChain().get(i).isHydrophob()){
-        indexAminoAcids.add(new Pair(i, foldedModel.getProtein().getProteinChain().get(i)));
+        hydrophobicAminoAcids.add(foldedModel.getProtein().getProteinChain().get(i));
       }
     }
 
-    for (int i = 0; i < indexAminoAcids.size() - 1; i++) {
-      for (int j = i + 1; j < indexAminoAcids.size(); j++){
-        if (isValidForEnergyCount(indexAminoAcids.get(i), indexAminoAcids.get(j))){
+    for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
+      for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
+        if (isValidForEnergyCount(hydrophobicAminoAcids.get(i), hydrophobicAminoAcids.get(j))) {
           fitness += 1;
         }
       }
     }
-    
     return fitness;
   }
 
   public static void fold(HPModel hpModel){
     Folding folding = hpModel.getFolding();
-
+    //set first index of the amino acid chain
+    hpModel.getProtein().getProteinChain().get(0).setIndex(0);
     for (int i = 0; i < folding.getFoldingDirection().length(); i++) {
       char direction = folding.getFoldingDirection().charAt(i);
       AminoAcid currentAminoAcid = hpModel.getProtein().getProteinChain().get(i + 1);
       AminoAcid previousAminoAcid = hpModel.getProtein().getProteinChain().get(i);
+      //set position and index of the amino acid
       currentAminoAcid.setPosition(move(direction, previousAminoAcid.getPosition()));
+      currentAminoAcid.setIndex(i + 1);
     }
   }
 
-  private static boolean isValidForEnergyCount(Pair first, Pair second){
-    AminoAcid firstAcid = first.getAminoAcid();
-    Integer firstIndex = first.getIndex();
-    AminoAcid secondAcid = second.getAminoAcid();
-    Integer secondIndex = second.getIndex();
+  private static boolean isValidForEnergyCount(AminoAcid first, AminoAcid second){
+    boolean isAdjacent = isAdjacent(first, second);
+    boolean isNeighbor = Math.abs(first.getIndex() - second.getIndex()) == 1;
 
-    boolean isAdjacent = isAdjacent(firstAcid, secondAcid);
-    boolean isNeighbor = Math.abs(firstIndex - secondIndex) == 1;
-    return isAdjacent && !isNeighbor;
+    boolean valid = isAdjacent && !isNeighbor;
+    if (valid){
+      System.out.println("Valid pair for fitness score: " + first + " and " + second);
+    }
+
+    return valid;
   }
 
   private static int manhattanDistance(Integer[] first, Integer[] second){
