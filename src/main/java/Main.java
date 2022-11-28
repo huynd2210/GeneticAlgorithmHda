@@ -3,18 +3,47 @@ import model.Folding;
 import model.HPModel;
 import model.Protein;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+
 public class Main {
 
-  public static void test(String sequence, String foldingDirection){
+  public static void test(String sequence, String foldingDirection) {
     Protein protein = new Protein(sequence);
     Folding folding = new Folding(foldingDirection);
     HPModel hpModel = new HPModel(protein, folding);
     Logic.fold(hpModel);
     System.out.println(hpModel);
-    System.out.println(Logic.getFitness(hpModel));
+    System.out.println(Logic.getFitnessOld(hpModel));
   }
 
-  public static void testOverlapping(){
+  public static void testHashing() {
+    int maxI = 770;
+    int maxJ = 770;
+    Map<Integer, Integer[]> map = new HashMap<>();
+    for (int i = 0; i < maxI; i++) {
+      for (int j = 0; j < maxJ; j++) {
+        int hash = Logic.hashPosition(new Integer[]{i, j});
+        if (map.containsKey(hash)){
+          System.out.println("Hash collision: " + hash + " " + i + " " + j + " " + map.get(hash)[0] + " " + map.get(hash)[1]);
+        }else{
+          map.put(hash, new Integer[]{i, j});
+        }
+      }
+    }
+  }
+
+  public static void testOverlapping() {
     test(Examples.SEQ7, "NWSSWNE");
   }
 
@@ -22,8 +51,57 @@ public class Main {
     test(Examples.SEQ7, "NWSWNNE");
   }
 
+  public static void runGraphicExample() {
+
+    int height = 500;
+    int width = 800;
+
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2 = image.createGraphics();
+    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+    g2.setColor(Color.YELLOW);
+    g2.fillRect(0, 0, width, height);
+
+    int cellSize = 80;
+
+    g2.setColor(new Color(0, 200, 0));
+    g2.fillRect(50, 50, cellSize, cellSize);
+
+    g2.setColor(new Color(255, 0, 0));
+    g2.fillRect(250, 50, cellSize, cellSize);
+
+    g2.setColor(Color.BLACK);
+    g2.drawLine(50 + cellSize, 50 + cellSize / 2, 250, 50 + cellSize / 2);
+
+    g2.setColor(new Color(255, 255, 255));
+    String label = "GA";
+    Font font = new Font("Serif", Font.PLAIN, 40);
+    g2.setFont(font);
+    FontMetrics metrics = g2.getFontMetrics();
+    int ascent = metrics.getAscent();
+    int labelWidth = metrics.stringWidth(label);
+
+    g2.drawString(label, 50 + cellSize / 2 - labelWidth / 2, 50 + cellSize / 2 + ascent / 2);
+
+    String folder = "C:\\Woodchop\\GeneticAlgorithmHda";
+    String filename = "image.png";
+    if (new File(folder).exists() == false) new File(folder).mkdirs();
+
+    try {
+      ImageIO.write(image, "png", new File(folder + File.separator + filename));
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(0);
+    }
+
+
+  }
+
   public static void main(String[] args) {
 //    testNoOverlapping();
-    testOverlapping();
+//    testOverlapping();
+    testHashing();
+//    runGraphicExample();
   }
 }

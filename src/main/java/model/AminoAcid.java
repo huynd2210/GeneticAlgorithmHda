@@ -24,6 +24,12 @@ public class AminoAcid {
     this.isOverlapping = false;
   }
 
+  public AminoAcid(AminoAcid copy){
+    this.isHydrophob = copy.isHydrophob;
+    this.position = Arrays.copyOf(copy.position, copy.position.length);
+    this.isOverlapping = copy.isOverlapping;
+  }
+
   public AminoAcid(char type) {
     this.isHydrophob = type == '1';
     this.position = new Integer[]{0, 0};

@@ -16,6 +16,10 @@ public class Folding {
     }
   }
 
+  public Folding(Folding copy){
+    this.foldingDirection = copy.getFoldingDirection();
+  }
+
   private boolean isValid(String foldingDirection) {
     return foldingDirection.matches("[NSEW]+");
   }

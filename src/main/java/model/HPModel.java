@@ -14,6 +14,11 @@ public class HPModel {
     this.folding = folding;
   }
 
+  public HPModel(HPModel copy){
+    this.protein = new Protein(copy.getProtein());
+    this.folding = new Folding(copy.getFolding());
+  }
+
   @Override
   public String toString() {
     return "HPModel{" +

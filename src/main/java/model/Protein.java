@@ -18,5 +18,12 @@ public class Protein {
     }
   }
 
+  public Protein(Protein copy){
+    proteinChain = new ArrayList<>();
+    for (AminoAcid aminoAcid : copy.getProteinChain()) {
+      proteinChain.add(new AminoAcid(aminoAcid));
+    }
+  }
+
 
 }

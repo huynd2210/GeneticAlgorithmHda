@@ -3,6 +3,7 @@ package logic;
 import model.AminoAcid;
 import model.Folding;
 import model.HPModel;
+import model.Individual;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,16 +12,17 @@ import java.util.Set;
 
 
 public class Logic {
+  private static final boolean isLogging = true;
   private Logic() {
   }
 
-  public static double getFitness(HPModel foldedModel) {
+  public static void evaluateFitness(Individual individual){
     double fitness = 1;
     int numberOfHHBonds = 0;
-    List<AminoAcid> hydrophobicAminoAcids = (filterForHydrophobicAcids(foldedModel));
+
+    List<AminoAcid> hydrophobicAminoAcids = filterForHydrophobicAcids(individual.getHpModel());
     List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
-    System.out.println("Number of overlapping amino acids: " + overlappingAminoAcids.size());
-    System.out.println("Overlapping amino acids: " + overlappingAminoAcids);
+
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
         if (isValidForEnergyCount(hydrophobicAminoAcids.get(i), hydrophobicAminoAcids.get(j))) {
@@ -28,7 +30,34 @@ public class Logic {
         }
       }
     }
-    System.out.println("Number of HH bonds: " + numberOfHHBonds);
+
+    individual.getIndividualInformation().setOverlappingAminoAcids(overlappingAminoAcids);
+    individual.getIndividualInformation().setNumberOfHHBonds(numberOfHHBonds);
+
+    fitness = fitness + ((double) numberOfHHBonds / (overlappingAminoAcids.size() + 1));
+    individual.setFitness(fitness);
+  }
+
+  public static double getFitnessOld(HPModel foldedModel) {
+    double fitness = 1;
+    int numberOfHHBonds = 0;
+
+    List<AminoAcid> hydrophobicAminoAcids = (filterForHydrophobicAcids(foldedModel));
+    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+
+    for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
+      for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
+        if (isValidForEnergyCount(hydrophobicAminoAcids.get(i), hydrophobicAminoAcids.get(j))) {
+          numberOfHHBonds += 1;
+        }
+      }
+    }
+
+    if (isLogging) {
+      System.out.println("Number of overlapping amino acids: " + overlappingAminoAcids.size());
+      System.out.println("Overlapping amino acids: " + overlappingAminoAcids);
+      System.out.println("Number of HH bonds: " + numberOfHHBonds);
+    }
 
     fitness = fitness + ((double) numberOfHHBonds / (overlappingAminoAcids.size() + 1));
 
@@ -54,7 +83,7 @@ public class Logic {
     boolean isNeighbor = Math.abs(first.getIndex() - second.getIndex()) == 1;
 
     boolean valid = isAdjacent && !isNeighbor;
-    if (valid) {
+    if (valid && isLogging) {
       System.out.println("Valid pair for fitness score: " + first + " and " + second);
     }
 
@@ -96,9 +125,10 @@ public class Logic {
     return overlappingAminoAcids;
   }
 
-  private static Integer hashPosition(Integer[] position) {
-    int prime = 31;
-    return position[0] * prime + position[1];
+  public static Integer hashPosition(Integer[] position) {
+    //choosing large prime for less collisions
+    final int prime = 773;
+    return (position[0] * prime) + position[1];
   }
 
   private static Integer[] move(char direction, Integer[] position) {
