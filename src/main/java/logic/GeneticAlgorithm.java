@@ -5,13 +5,60 @@ import model.Individual;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class GeneticAlgorithm {
   private static final int POPULATION_SIZE = 100;
   private static final int MAX_GENERATIONS = 100;
+  private static final Random r = new Random();
 
-  private static List<Individual> initPopulation(String protein){
-    return null;
+  public static Individual runGeneticAlgorithm(String targetProtein){
+    //generate and evaluate initial population
+    List<Individual> currentPopulation = initPopulation(targetProtein);
+    evaluatePopulationFitness(currentPopulation);
+    Individual bestIndividual = findBestFitnessOfPopulation(currentPopulation);
+
+    List<String[]> logs = new ArrayList<>();
+    logs.add(new String[]{"Generation", "Average fitness", "Best current fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids"});
+    for (int i = 0; i < MAX_GENERATIONS; i++) {
+      String[] dataLine = new String[6];
+      dataLine[0] = String.valueOf(i);
+      dataLine[1] = String.valueOf(findAverageFitnessOfPopulation(currentPopulation));
+      Individual currentMostFit = findBestFitnessOfPopulation(currentPopulation);
+      dataLine[2] = String.valueOf(currentMostFit.getFitness());
+
+      if (currentMostFit.getFitness() > bestIndividual.getFitness()) {
+        bestIndividual = currentMostFit;
+      }
+      dataLine[3] = String.valueOf(bestIndividual.getFitness());
+      dataLine[4] = Integer.toString(bestIndividual.getIndividualInformation().getNumberOfHHBonds());
+      dataLine[5] = Integer.toString(bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size());
+      logs.add(dataLine);
+
+      currentPopulation = evolveNextGeneration(currentPopulation);
+    }
+//    return currentPopulation;
+    Logger.write("C:\\Woodchop\\GeneticAlgorithmHda\\data.csv", logs);
+    return bestIndividual;
+  }
+
+
+  private static double findAverageFitnessOfPopulation(List<Individual> population){
+    double averageFitness = 0;
+    for (Individual individual : population) {
+      averageFitness += individual.getFitness();
+    }
+    return averageFitness / population.size();
+  }
+
+  private static Individual findBestFitnessOfPopulation(List<Individual> population){
+    Individual bestIndividual = population.get(0);
+    for (Individual individual : population) {
+      if (individual.getFitness() > bestIndividual.getFitness()) {
+        bestIndividual = individual;
+      }
+    }
+    return bestIndividual;
   }
 
   private static void evaluatePopulationFitness(List<Individual> population) {
@@ -22,7 +69,7 @@ public class GeneticAlgorithm {
   }
 
   private static List<Individual> evolveNextGeneration(List<Individual> currentGenerationPopulation) {
-    List<Individual> newPopulation = new ArrayList<>(currentGenerationPopulation.size());
+    List<Individual> newPopulation = new ArrayList<>();
     evaluatePopulationFitness(currentGenerationPopulation);
     for (int i = 0; i < currentGenerationPopulation.size(); i++) {
       makeOffspring(newPopulation, currentGenerationPopulation);
@@ -68,4 +115,23 @@ public class GeneticAlgorithm {
     //return a random parent
     return Math.random() < 0.5 ? List.of(firstParent) : List.of(secondParent);
   }
+  private static String randomizeFolding(String protein){
+    StringBuilder sb = new StringBuilder();
+    final String direction = "NSEW";
+    for (int i = 0; i < protein.length() - 1; i++) {
+      int randomInt = r.nextInt(4);
+      sb.append(direction.charAt((randomInt)));
+    }
+    return sb.toString();
+  }
+
+  private static List<Individual> initPopulation(String protein){
+    List<Individual> population = new ArrayList<>();
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+      String foldingDirection = randomizeFolding(protein);
+      population.add(new Individual(protein, foldingDirection));
+    }
+    return population;
+  }
+
 }

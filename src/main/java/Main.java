@@ -1,6 +1,8 @@
+import logic.GeneticAlgorithm;
 import logic.Logic;
 import model.Folding;
 import model.HPModel;
+import model.Individual;
 import model.Protein;
 
 import java.awt.Color;
@@ -12,11 +14,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 public class Main {
+
+  public static void testGA(){
+    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ12);
+    System.out.println(individuals);
+  }
 
   public static void test(String sequence, String foldingDirection) {
     Protein protein = new Protein(sequence);
@@ -101,7 +109,8 @@ public class Main {
   public static void main(String[] args) {
 //    testNoOverlapping();
 //    testOverlapping();
-    testHashing();
+//    testHashing();
 //    runGraphicExample();
+    testGA();
   }
 }

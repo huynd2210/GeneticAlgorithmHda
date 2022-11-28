@@ -12,7 +12,7 @@ import java.util.Set;
 
 
 public class Logic {
-  private static final boolean isLogging = true;
+  private static final boolean isLogging = false;
   private Logic() {
   }
 
