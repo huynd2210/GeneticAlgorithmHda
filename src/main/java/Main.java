@@ -4,6 +4,7 @@ import model.Folding;
 import model.HPModel;
 import model.Individual;
 import model.Protein;
+import util.GraphicsUtil;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -59,6 +60,8 @@ public class Main {
     test(Examples.SEQ7, "NWSWNNE");
   }
 
+
+
   public static void runGraphicExample() {
 
     int height = 500;
@@ -71,7 +74,7 @@ public class Main {
     g2.setColor(Color.YELLOW);
     g2.fillRect(0, 0, width, height);
 
-    int cellSize = 80;
+    int cellSize = 50;
 
     g2.setColor(new Color(0, 200, 0));
     g2.fillRect(50, 50, cellSize, cellSize);
@@ -111,6 +114,8 @@ public class Main {
 //    testOverlapping();
 //    testHashing();
 //    runGraphicExample();
-    testGA();
+//    testGA();
+
+    new GraphicsUtil().drawAtCoord(1,2, "0");
   }
 }

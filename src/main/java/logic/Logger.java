@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Logger {
-
-
   public static void write(String path, List<String[]> dataLines){
     File csvOutputFile = new File(path);
 
@@ -25,9 +23,6 @@ public class Logger {
   }
 
   private static String convertToCSV(String[] data) {
-    return String.join(",", data);
+    return String.join("|", data);
   }
-
-
-
 }

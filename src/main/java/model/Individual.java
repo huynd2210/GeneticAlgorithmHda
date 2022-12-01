@@ -31,10 +31,7 @@ public class Individual {
 
   @Override
   public String toString() {
-    return "Individual{" +
-            "hpModel=" + hpModel +
-            ", fitness=" + fitness +
-            ", individualInformation=" + individualInformation +
-            '}';
+    return "I{" +
+            this.hpModel.getFolding().getFoldingDirection() + " " + this.fitness + '}';
   }
 }

@@ -19,9 +19,9 @@ public class GeneticAlgorithm {
     Individual bestIndividual = findBestFitnessOfPopulation(currentPopulation);
 
     List<String[]> logs = new ArrayList<>();
-    logs.add(new String[]{"Generation", "Average fitness", "Best current fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids"});
+    logs.add(new String[]{"Generation", "Average fitness", "Best current fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids", "Best Folding", "Population"});
     for (int i = 0; i < MAX_GENERATIONS; i++) {
-      String[] dataLine = new String[6];
+      String[] dataLine = new String[8];
       dataLine[0] = String.valueOf(i);
       dataLine[1] = String.valueOf(findAverageFitnessOfPopulation(currentPopulation));
       Individual currentMostFit = findBestFitnessOfPopulation(currentPopulation);
@@ -33,6 +33,8 @@ public class GeneticAlgorithm {
       dataLine[3] = String.valueOf(bestIndividual.getFitness());
       dataLine[4] = Integer.toString(bestIndividual.getIndividualInformation().getNumberOfHHBonds());
       dataLine[5] = Integer.toString(bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size());
+      dataLine[6] = bestIndividual.getHpModel().getFolding().getFoldingDirection();
+      dataLine[7] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
       logs.add(dataLine);
 
       currentPopulation = evolveNextGeneration(currentPopulation);
@@ -48,7 +50,7 @@ public class GeneticAlgorithm {
     for (Individual individual : population) {
       averageFitness += individual.getFitness();
     }
-    return averageFitness / population.size();
+      return averageFitness / population.size();
   }
 
   private static Individual findBestFitnessOfPopulation(List<Individual> population){
@@ -75,13 +77,19 @@ public class GeneticAlgorithm {
       makeOffspring(newPopulation, currentGenerationPopulation);
     }
     //do mutation here
-    return currentGenerationPopulation;
+
+    //sum of currentGenerationPopulation
+//    double currentGenSum = currentGenerationPopulation.stream().mapToDouble(Individual::getFitness).sum();
+//    double newGenSum = newPopulation.stream().mapToDouble(Individual::getFitness).sum();
+
+    return newPopulation;
   }
 
   private static void makeOffspring(List<Individual> newPopulation, List<Individual> oldPopulation){
     Individual firstParent = rouletteWheelSelection(oldPopulation);
-    Individual secondParent = rouletteWheelSelection(oldPopulation);
-    newPopulation.addAll(crossover(firstParent, secondParent));
+//    Individual secondParent = rouletteWheelSelection(oldPopulation);
+//    newPopulation.addAll(crossover(firstParent, secondParent));
+    newPopulation.add(firstParent);
   }
 
   private static Individual rouletteWheelSelection(List<Individual> population) {
@@ -106,15 +114,15 @@ public class GeneticAlgorithm {
     return null;
   }
 
-  private static List<Individual> crossover(Individual firstParent, Individual secondParent){
+//  private static List<Individual> crossover(Individual firstParent, Individual secondParent){
     //no crossover for now
 //    List<Individual> children = new ArrayList<>();
 //    children.add(firstParent);
 //    children.add(secondParent);
 //    return children;
     //return a random parent
-    return Math.random() < 0.5 ? List.of(firstParent) : List.of(secondParent);
-  }
+//    return Math.random() < 0.5 ? List.of(firstParent) : List.of(secondParent);
+//  }
   private static String randomizeFolding(String protein){
     StringBuilder sb = new StringBuilder();
     final String direction = "NSEW";
