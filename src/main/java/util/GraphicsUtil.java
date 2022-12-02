@@ -1,6 +1,7 @@
 package util;
 
 import logic.GraphicLogic;
+import logic.Logic;
 import model.AminoAcid;
 import model.HPModel;
 
@@ -9,6 +10,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class GraphicsUtil {
   private int cellSize = 50;
@@ -16,6 +21,8 @@ public class GraphicsUtil {
   private int canvasWidth = 800;
   private BufferedImage image;
   private Graphics2D g2;
+  private final int labelOffsetI = 4;
+  private final int labelOffsetJ = -1;
 
 
   public GraphicsUtil(){
@@ -23,37 +30,34 @@ public class GraphicsUtil {
   }
 
   public void drawAtCoord(int i, int j, String label){
-    this.drawSampleGrid(i, j);
+//    this.drawSampleGrid(i, j);
     int y = i * cellSize;
     int x = j * cellSize;
-
-    int labelOffsetI = 4;
-    int labelOffsetJ = -1;
 
     g2.setColor(Color.YELLOW);
     g2.fillRect(x, y, cellSize, cellSize);
     g2.setColor(Color.BLACK);
+//    g2.drawString(label, x + (cellSize / 2) + labelOffsetJ, y + (cellSize / 2) + labelOffsetI);
+//    drawCellConnection(i, j - 1, i, j);
+//    save();
+  }
+
+  private void drawLabel(int i, int j, String label){
+    int y = i * cellSize;
+    int x = j * cellSize;
+    g2.setColor(Color.BLACK);
     g2.drawString(label, x + (cellSize / 2) + labelOffsetJ, y + (cellSize / 2) + labelOffsetI);
-    drawCellConnection(i, j - 1, i, j);
-    save();
   }
 
   public void drawCellConnection(int fromI, int fromJ, int toI, int toJ){
     final int offSetI = 25;
     final int offSetJ = 25;
     int fromY = (fromI * cellSize) + offSetI;
-//    int fromY = fromI + cellSize;
-//    int fromX = fromJ + cellSize / 2;
     int fromX = (fromJ * cellSize) + offSetJ;
     int toY = (toI * cellSize) + offSetI;
-//    int toY = toI + cellSize;
-//    int toX = toJ + cellSize / 2;
     int toX = (toJ * cellSize) + offSetJ;
     g2.setColor(Color.RED);
     g2.drawLine(fromX, fromY, toX, toY);
-//    save();
-//    g2.setColor(Color.BLACK);
-//    g2.drawLine(50 + cellSize, 50 + cellSize / 2, 250, 50 + cellSize / 2);
   }
 
   public void drawSampleGrid(int maxI, int maxJ){
@@ -76,12 +80,33 @@ public class GraphicsUtil {
     int maxI = GraphicLogic.findUpOffset(foldedModel) + GraphicLogic.findDownOffset(foldedModel);
     int maxJ = GraphicLogic.findLeftOffset(foldedModel) + GraphicLogic.findRightOffset(foldedModel);
 
-    int cellSize = Math.min(canvasHeight / maxI, canvasWidth / maxJ);
+//    int cellSize = Math.min(canvasHeight / maxI, canvasWidth / maxJ);
     HPModel graphic = GraphicLogic.normalize(foldedModel);
     GraphicLogic.sort(graphic);
 
+    Set<Integer> positionSet = new HashSet<>();
+
+    Integer[] previousPosition = null;
+    //map contains label at position for drawing label after hpmodel is drawn
+    Map<String, String> positionLabelMap = new HashMap<>();
+
     for (AminoAcid aminoAcid : foldedModel.getProtein().getProteinChain()) {
-//      aminoAcid.getPosition(aminoAcid);
+      Integer[] currentPosition = aminoAcid.getPosition();
+      Integer positionHash = Logic.hashPosition(currentPosition);
+
+      if (!positionSet.contains(positionHash)){
+        positionSet.add(positionHash);
+        drawAtCoord(currentPosition[0], currentPosition[1], Integer.toString(aminoAcid.getIndex()));
+
+        if (previousPosition != null){
+          drawCellConnection(previousPosition[0], previousPosition[1], currentPosition[0], currentPosition[1]);
+        }
+        previousPosition = currentPosition;
+      }else{
+        //resolve drawing overlaps
+//        g2.drawString(Integer.toString(aminoAcid.getIndex()), currentPosition[1] + (cellSize / 2) + labelOffsetJ + , currentPosition[0] + (cellSize / 2) + labelOffsetI);
+        positionLabelMap.put(currentPosition.toString(), positionLabelMap.get(currentPosition) + ", " + aminoAcid.getIndex());
+      }
     }
 
   }
