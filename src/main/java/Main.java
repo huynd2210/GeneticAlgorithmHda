@@ -4,7 +4,7 @@ import model.Folding;
 import model.HPModel;
 import model.Individual;
 import model.Protein;
-import util.GraphicsUtil;
+import graphics.GraphicsUtil;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -32,6 +31,11 @@ public class Main {
     Folding folding = new Folding(foldingDirection);
     HPModel hpModel = new HPModel(protein, folding);
     Logic.fold(hpModel);
+
+    GraphicsUtil graphics = new GraphicsUtil();
+    graphics.drawModel(hpModel);
+    graphics.save();
+
     System.out.println(hpModel);
     System.out.println(Logic.getFitnessOld(hpModel));
   }
@@ -95,7 +99,7 @@ public class Main {
 
     g2.drawString(label, 50 + cellSize / 2 - labelWidth / 2, 50 + cellSize / 2 + ascent / 2);
 
-    String folder = "C:\\Woodchop\\GeneticAlgorithmHda";
+    String folder = ".";
     String filename = "image.png";
     if (new File(folder).exists() == false) new File(folder).mkdirs();
 
@@ -111,11 +115,10 @@ public class Main {
 
   public static void main(String[] args) {
 //    testNoOverlapping();
-//    testOverlapping();
+    testOverlapping();
 //    testHashing();
 //    runGraphicExample();
 //    testGA();
-
-    new GraphicsUtil().drawAtCoord(1,2, "0");
+//    new GraphicsUtil().drawAtCoord(1,2, "0");
   }
 }

@@ -1,5 +1,7 @@
 package logic;
 
+import graphics.GraphicsModel;
+import graphics.GraphicsNode;
 import model.AminoAcid;
 import model.HPModel;
 
@@ -51,4 +53,19 @@ public class GraphicLogic {
     normalizedModel.getProtein().getProteinChain().sort(Comparator.comparing(AminoAcid::getIndex));
   }
 
+  public static GraphicsModel getGraphicsModel(HPModel normalizedModel) {
+    GraphicsModel graphicsModel = new GraphicsModel();
+    for (AminoAcid aminoAcid : normalizedModel.getProtein().getProteinChain()) {
+      GraphicsNode node = graphicsModel.FindNode(aminoAcid.getPosition());
+      if (node != null) {
+        node.getAminoAcids().add(aminoAcid);
+      } else {
+        node = new GraphicsNode();
+        node.setPosition(aminoAcid.getPosition());
+        node.getAminoAcids().add(aminoAcid);
+        graphicsModel.AddNode(node);
+      }
+    }
+    return graphicsModel;
+  }
 }

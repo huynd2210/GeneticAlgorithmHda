@@ -1,4 +1,4 @@
-package util;
+package graphics;
 
 import logic.GraphicLogic;
 import logic.Logic;
@@ -10,54 +10,76 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 public class GraphicsUtil {
   private int cellSize = 50;
+
+  private int cellPadding = 25;
   private int canvasHeight = 500;
   private int canvasWidth = 800;
   private BufferedImage image;
   private Graphics2D g2;
-  private final int labelOffsetI = 4;
-  private final int labelOffsetJ = -1;
+  private final int labelOffsetI = 5;
+  private final int labelOffsetJ = -5;
 
 
   public GraphicsUtil(){
     this.init();
   }
 
-  public void drawAtCoord(int i, int j, String label){
+  public void drawAtCoord(int i, int j, List<AminoAcid> aminoAcids){
 //    this.drawSampleGrid(i, j);
-    int y = i * cellSize;
-    int x = j * cellSize;
+    int y = (i + 2) * (cellSize + cellPadding);
+    int x = (j + 2) * (cellSize + cellPadding);
+    int offsetOverlapp = 10;
 
-    g2.setColor(Color.YELLOW);
-    g2.fillRect(x, y, cellSize, cellSize);
-    g2.setColor(Color.BLACK);
+    for (int k = 0; k < aminoAcids.size(); k++) {
+      x += k * offsetOverlapp;
+      y -= k * offsetOverlapp;
+
+      g2.setColor(Color.BLACK);
+      g2.setStroke(new BasicStroke(2));
+      g2.fillRect(x, y, cellSize, cellSize);
+      if (!aminoAcids.get(k).isHydrophob()) {
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(2));
+        g2.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+      }
+    }
+
 //    g2.drawString(label, x + (cellSize / 2) + labelOffsetJ, y + (cellSize / 2) + labelOffsetI);
 //    drawCellConnection(i, j - 1, i, j);
 //    save();
   }
 
-  private void drawLabel(int i, int j, String label){
-    int y = i * cellSize;
-    int x = j * cellSize;
-    g2.setColor(Color.BLACK);
-    g2.drawString(label, x + (cellSize / 2) + labelOffsetJ, y + (cellSize / 2) + labelOffsetI);
+  private void drawLabel(int i, int j, List<AminoAcid> aminoAcids){
+    final int offSetI = cellSize / 2;
+    final int offSetJ = cellSize / 2;
+    int y = (i + 2) * (cellSize + cellPadding);
+    int x = (j + 2) * (cellSize + cellPadding);
+
+    String label = "";
+    for (AminoAcid aminoAcid : aminoAcids) {
+      label += aminoAcid.getIndex() + ",";
+    }
+
+    g2.setColor(Color.ORANGE);
+    g2.drawString(label, x + offSetJ + labelOffsetJ, y + offSetI + labelOffsetI);
   }
 
   public void drawCellConnection(int fromI, int fromJ, int toI, int toJ){
-    final int offSetI = 25;
-    final int offSetJ = 25;
-    int fromY = (fromI * cellSize) + offSetI;
-    int fromX = (fromJ * cellSize) + offSetJ;
-    int toY = (toI * cellSize) + offSetI;
-    int toX = (toJ * cellSize) + offSetJ;
+    final int offSetI = cellSize / 2;
+    final int offSetJ = cellSize / 2;
+    int fromY = ((fromI + 2) * (cellSize + cellPadding)) + offSetI;
+    int fromX = ((fromJ + 2) * (cellSize + cellPadding)) + offSetJ;
+    int toY = ((toI + 2) * (cellSize + cellPadding)) + offSetI;
+    int toX = ((toJ + 2) * (cellSize + cellPadding)) + offSetJ;
     g2.setColor(Color.RED);
+    g2.setStroke(new BasicStroke(5));
     g2.drawLine(fromX, fromY, toX, toY);
+    g2.setColor(Color.BLACK);
   }
 
   public void drawSampleGrid(int maxI, int maxJ){
@@ -73,14 +95,20 @@ public class GraphicsUtil {
     image = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_RGB);
     g2 = image.createGraphics();
     g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+    drawBackground(Color.WHITE);
+
+    Font currentFont = g2.getFont();
+    Font newFont = currentFont.deriveFont(currentFont.getSize() * 1.5F);
+    g2.setFont(newFont);
   }
 
   //TODO
-  private void drawModel(HPModel foldedModel){
-    int maxI = GraphicLogic.findUpOffset(foldedModel) + GraphicLogic.findDownOffset(foldedModel);
-    int maxJ = GraphicLogic.findLeftOffset(foldedModel) + GraphicLogic.findRightOffset(foldedModel);
-
+  public void drawModel(HPModel foldedModel) {
+//    int maxI = GraphicLogic.findUpOffset(foldedModel) + GraphicLogic.findDownOffset(foldedModel);
+//    int maxJ = GraphicLogic.findLeftOffset(foldedModel) + GraphicLogic.findRightOffset(foldedModel);
 //    int cellSize = Math.min(canvasHeight / maxI, canvasWidth / maxJ);
+/* Old code
     HPModel graphic = GraphicLogic.normalize(foldedModel);
     GraphicLogic.sort(graphic);
 
@@ -102,13 +130,39 @@ public class GraphicsUtil {
           drawCellConnection(previousPosition[0], previousPosition[1], currentPosition[0], currentPosition[1]);
         }
         previousPosition = currentPosition;
-      }else{
+      } else {
         //resolve drawing overlaps
 //        g2.drawString(Integer.toString(aminoAcid.getIndex()), currentPosition[1] + (cellSize / 2) + labelOffsetJ + , currentPosition[0] + (cellSize / 2) + labelOffsetI);
         positionLabelMap.put(currentPosition.toString(), positionLabelMap.get(currentPosition) + ", " + aminoAcid.getIndex());
       }
     }
+*/
+    HPModel normalizedModel = GraphicLogic.normalize(foldedModel);
+    GraphicLogic.sort(normalizedModel);
 
+    GraphicsModel graphics = GraphicLogic.getGraphicsModel(normalizedModel);
+
+    // Draw connection
+    Integer[] previousPosition = null;
+    for (GraphicsNode node : graphics.getNodes()) {
+      Integer[] currentPosition = node.getPosition();
+      if (previousPosition != null) {
+        drawCellConnection(previousPosition[0], previousPosition[1], currentPosition[0], currentPosition[1]);
+      }
+      previousPosition = currentPosition;
+    }
+
+    // Draw cells
+    for (GraphicsNode node : graphics.getNodes()) {
+      Integer[] currentPosition = node.getPosition();
+      drawAtCoord(currentPosition[0], currentPosition[1], node.getAminoAcids());
+    }
+
+    // Draw indexes
+    for (GraphicsNode node : graphics.getNodes()) {
+      Integer[] currentPosition = node.getPosition();
+      drawLabel(currentPosition[0], currentPosition[1], node.getAminoAcids());
+    }
   }
 
   private void drawBackground(Color color) {
@@ -128,8 +182,8 @@ public class GraphicsUtil {
     g2.fillRect(x, y, cellSize, cellSize);
   }
 
-  private void save(){
-    String folder = "C:\\Woodchop\\GeneticAlgorithmHda";
+  public void save(){
+    String folder = ".";
     String filename = "image.png";
     if (!new File(folder).exists()) new File(folder).mkdirs();
 
