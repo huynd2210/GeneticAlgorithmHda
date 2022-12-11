@@ -11,12 +11,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
 
 public class GraphicsUtil {
   private int cellSize = 50;
-
   private int cellPadding = 25;
   private int canvasHeight = 500;
   private int canvasWidth = 800;
@@ -33,19 +31,19 @@ public class GraphicsUtil {
   private void drawAtCoord(int i, int j, List<AminoAcid> aminoAcids){
     int y = (i + 2) * (cellSize + cellPadding);
     int x = (j + 2) * (cellSize + cellPadding);
-    int offsetOverlapp = 10;
+    int offsetOverlapp = 5;
 
     for (int k = 0; k < aminoAcids.size(); k++) {
-      x += k * offsetOverlapp;
-      y -= k * offsetOverlapp;
+      int offsetX = k * offsetOverlapp;
+      int offsetY = k * offsetOverlapp;
 
       g2.setColor(Color.BLACK);
       g2.setStroke(new BasicStroke(2));
-      g2.fillRect(x, y, cellSize, cellSize);
+      g2.fillRect(x + offsetX, y - offsetY, cellSize, cellSize);
       if (!aminoAcids.get(k).isHydrophob()) {
         g2.setColor(Color.WHITE);
         g2.setStroke(new BasicStroke(2));
-        g2.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+        g2.fillRect(x + offsetX + 1, y - offsetY + 1, cellSize - 2, cellSize - 2);
       }
     }
 
