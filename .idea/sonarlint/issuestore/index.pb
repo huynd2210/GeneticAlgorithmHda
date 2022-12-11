@@ -7,5 +7,3 @@ P
  src/main/java/model/Protein.java,3\b\3b10242203f5ae023a7ec9193699f388df679fc0
 L
 src/main/java/logic/tmp.java,a\7\a7d0e32159b2dee8cec8aad7b71c4d238192e543
-O
-src/main/java/logic/Logger.java,9\e\9e74a7213e37166c89bd83587ccf7250322d6ab6

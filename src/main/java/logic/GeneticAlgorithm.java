@@ -13,6 +13,10 @@ public class GeneticAlgorithm {
   private static final Random r = new Random();
   private static double MUTATION_RATE = 0.02;
 
+  private GeneticAlgorithm(){
+
+  }
+
   public static Individual runGeneticAlgorithm(String targetProtein) {
     //generate and evaluate initial population
     List<Individual> currentPopulation = initPopulation(targetProtein);
@@ -40,11 +44,9 @@ public class GeneticAlgorithm {
 
       currentPopulation = evolveNextGeneration(currentPopulation);
     }
-//    return currentPopulation;
     Logger.write("C:\\Woodchop\\GeneticAlgorithmHda\\data.csv", logs);
     return bestIndividual;
   }
-
 
   private static double findAverageFitnessOfPopulation(List<Individual> population) {
     double averageFitness = 0;
@@ -70,6 +72,7 @@ public class GeneticAlgorithm {
     for (Individual individual : newPopulation) {
       mutate(individual);
     }
+    return newPopulation;
   }
 
   private static void evaluatePopulationFitness(List<Individual> population) {
@@ -77,14 +80,6 @@ public class GeneticAlgorithm {
       Logic.fold(individual.getHpModel());
       Logic.evaluateFitness(individual);
     }
-  }
-
-  private static List<Individual> selectForReproduction(List<Individual> currentGenerationPopulation) {
-    List<Individual> selectedForReproduction = new ArrayList<>();
-    for (int i = 0; i < currentGenerationPopulation.size(); i++) {
-      selectedForReproduction.add(rouletteWheelSelection(currentGenerationPopulation));
-    }
-    return selectedForReproduction;
   }
 
   private static List<Individual> makeOffspring(List<Individual> currentGenerationPopulation) {
@@ -102,6 +97,14 @@ public class GeneticAlgorithm {
       nextGeneration.addAll(crossover(firstParent, secondParent));
     }
     return nextGeneration;
+  }
+
+  private static List<Individual> selectForReproduction(List<Individual> currentGenerationPopulation) {
+    List<Individual> selectedForReproduction = new ArrayList<>();
+    for (int i = 0; i < currentGenerationPopulation.size(); i++) {
+      selectedForReproduction.add(rouletteWheelSelection(currentGenerationPopulation));
+    }
+    return selectedForReproduction;
   }
 
   private static Individual rouletteWheelSelection(List<Individual> population) {
@@ -141,7 +144,7 @@ public class GeneticAlgorithm {
     return children;
   }
 
-  private void mutate(Individual individual) {
+  private static void mutate(Individual individual) {
     final String direction = "NSEW";
     StringBuilder sb = new StringBuilder(individual.getHpModel().getFolding().getFoldingDirection());
     for (int i = 0; i < sb.length(); i++) {
@@ -153,6 +156,14 @@ public class GeneticAlgorithm {
     individual.getHpModel().getFolding().setFoldingDirection(sb.toString());
   }
 
+  private static List<Individual> initPopulation(String protein) {
+    List<Individual> population = new ArrayList<>();
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+      String foldingDirection = randomizeFolding(protein);
+      population.add(new Individual(protein, foldingDirection));
+    }
+    return population;
+  }
 
   private static String randomizeFolding(String protein) {
     StringBuilder sb = new StringBuilder();
@@ -163,14 +174,4 @@ public class GeneticAlgorithm {
     }
     return sb.toString();
   }
-
-  private static List<Individual> initPopulation(String protein) {
-    List<Individual> population = new ArrayList<>();
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-      String foldingDirection = randomizeFolding(protein);
-      population.add(new Individual(protein, foldingDirection));
-    }
-    return population;
-  }
-
 }
