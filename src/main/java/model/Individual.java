@@ -29,6 +29,13 @@ public class Individual {
     this.individualInformation = new IndividualInformation(copy.getIndividualInformation());
   }
 
+  public Individual(Individual copy, String foldingDirection) {
+    this.hpModel = new HPModel(copy.getHpModel());
+    this.fitness = copy.getFitness();
+    this.individualInformation = new IndividualInformation(copy.getIndividualInformation());
+    this.hpModel.getFolding().setFoldingDirection(foldingDirection);
+  }
+
   @Override
   public String toString() {
     return "I{" +

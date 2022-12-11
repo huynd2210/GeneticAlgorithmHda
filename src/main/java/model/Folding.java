@@ -1,12 +1,14 @@
 package model;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
 public class Folding {
-  private final String foldingDirection;
+  private String foldingDirection;
 
   public Folding(String foldingDirection) {
     if (this.isValid(foldingDirection)) {

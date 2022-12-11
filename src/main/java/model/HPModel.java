@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class HPModel {
   private final Protein protein;
-  private final Folding folding;
+  private Folding folding;
 
   public HPModel(Protein protein, Folding folding) {
     this.protein = protein;
@@ -26,4 +26,6 @@ public class HPModel {
             ", folding=" + folding +
             '}';
   }
+
+
 }

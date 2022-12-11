@@ -74,8 +74,6 @@ public class Main {
     test(Examples.SEQ7, "NWSWNNE");
   }
 
-
-
   public static void runGraphicExample() {
 
     int height = 500;
