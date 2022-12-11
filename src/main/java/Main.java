@@ -20,9 +20,19 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class Main {
+  public static void runGA(String proteinSequence){
+    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(proteinSequence);
+    GraphicsUtil graphicsUtil = new GraphicsUtil();
+    graphicsUtil.drawModel(individuals.getHpModel());
+    graphicsUtil.save();
+    System.out.println(individuals);
+  }
 
   public static void testGA(){
     Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ12);
+    GraphicsUtil graphicsUtil = new GraphicsUtil();
+    graphicsUtil.drawModel(individuals.getHpModel());
+    graphicsUtil.save();
     System.out.println(individuals);
   }
 
@@ -100,7 +110,7 @@ public class Main {
     g2.drawString(label, 50 + cellSize / 2 - labelWidth / 2, 50 + cellSize / 2 + ascent / 2);
 
     String folder = ".";
-    String filename = "image.png";
+    String filename = "sample graphic.png";
     if (new File(folder).exists() == false) new File(folder).mkdirs();
 
     try {
@@ -115,10 +125,14 @@ public class Main {
 
   public static void main(String[] args) {
 //    testNoOverlapping();
-    testOverlapping();
+//    testOverlapping();
 //    testHashing();
 //    runGraphicExample();
-//    testGA();
+    testGA();
 //    new GraphicsUtil().drawAtCoord(1,2, "0");
+
+
+
+
   }
 }

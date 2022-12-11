@@ -4,6 +4,7 @@ import logic.GraphicLogic;
 import logic.Logic;
 import model.AminoAcid;
 import model.HPModel;
+import model.Individual;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,8 +30,7 @@ public class GraphicsUtil {
     this.init();
   }
 
-  public void drawAtCoord(int i, int j, List<AminoAcid> aminoAcids){
-//    this.drawSampleGrid(i, j);
+  private void drawAtCoord(int i, int j, List<AminoAcid> aminoAcids){
     int y = (i + 2) * (cellSize + cellPadding);
     int x = (j + 2) * (cellSize + cellPadding);
     int offsetOverlapp = 10;
@@ -69,7 +69,7 @@ public class GraphicsUtil {
     g2.drawString(label, x + offSetJ + labelOffsetJ, y + offSetI + labelOffsetI);
   }
 
-  public void drawCellConnection(int fromI, int fromJ, int toI, int toJ){
+  private void drawCellConnection(int fromI, int fromJ, int toI, int toJ){
     final int offSetI = cellSize / 2;
     final int offSetJ = cellSize / 2;
     int fromY = ((fromI + 2) * (cellSize + cellPadding)) + offSetI;
@@ -82,7 +82,7 @@ public class GraphicsUtil {
     g2.setColor(Color.BLACK);
   }
 
-  public void drawSampleGrid(int maxI, int maxJ){
+  private void drawSampleGrid(int maxI, int maxJ){
     for (int i = 0; i <= maxI; i++) {
       for (int j = 0; j <= maxJ; j++) {
         g2.drawRect(j * cellSize, i * cellSize, cellSize, cellSize);
@@ -103,7 +103,10 @@ public class GraphicsUtil {
     g2.setFont(newFont);
   }
 
-  //TODO
+  public void drawIndividual(Individual individual){
+    this.drawModel(individual.getHpModel());
+  }
+
   public void drawModel(HPModel foldedModel) {
 //    int maxI = GraphicLogic.findUpOffset(foldedModel) + GraphicLogic.findDownOffset(foldedModel);
 //    int maxJ = GraphicLogic.findLeftOffset(foldedModel) + GraphicLogic.findRightOffset(foldedModel);
@@ -216,7 +219,7 @@ public class GraphicsUtil {
     g2.drawString(label, 50 + cellSize / 2 - labelWidth / 2, 50 + cellSize / 2 + ascent / 2);
 
     String folder = "C:\\Woodchop\\GeneticAlgorithmHda";
-    String filename = "image.png";
+    String filename = "sample graphic.png";
     if (!new File(folder).exists()) new File(folder).mkdirs();
 
     try {

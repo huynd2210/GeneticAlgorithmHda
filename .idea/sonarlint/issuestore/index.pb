@@ -13,7 +13,5 @@ P
 .src/main/java/model/IndividualInformation.java,f\7\f731ec168cd5a67c7297498e8d4e1f77a35a5ee9
 P
  src/main/java/model/Folding.java,6\3\631f0e39748bcf7a2052afd1f8caecf4018f11ff
-8
-data.csv,1\a\1aa5784d52481911bc44df0e8b6a8fd581b0518c
 O
 src/main/java/logic/Logger.java,9\e\9e74a7213e37166c89bd83587ccf7250322d6ab6
