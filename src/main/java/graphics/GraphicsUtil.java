@@ -5,6 +5,7 @@ import logic.Logic;
 import model.AminoAcid;
 import model.HPModel;
 import model.Individual;
+import util.Vector2D;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -144,13 +145,11 @@ public class GraphicsUtil {
     GraphicsModel graphics = GraphicLogic.getGraphicsModel(normalizedModel);
 
     // Draw connection
-    Integer[] previousPosition = null;
     for (GraphicsNode node : graphics.getNodes()) {
       Integer[] currentPosition = node.getPosition();
-      if (previousPosition != null) {
-        drawCellConnection(previousPosition[0], previousPosition[1], currentPosition[0], currentPosition[1]);
+      for (Vector2D connection : node.getConnections()) {
+        drawCellConnection(connection.getX(), connection.getY(), currentPosition[0], currentPosition[1]);
       }
-      previousPosition = currentPosition;
     }
 
     // Draw cells

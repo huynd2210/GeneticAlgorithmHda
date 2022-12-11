@@ -4,6 +4,7 @@ import graphics.GraphicsModel;
 import graphics.GraphicsNode;
 import model.AminoAcid;
 import model.HPModel;
+import util.Vector2D;
 
 import java.util.Comparator;
 
@@ -55,6 +56,9 @@ public class GraphicLogic {
 
   public static GraphicsModel getGraphicsModel(HPModel normalizedModel) {
     GraphicsModel graphicsModel = new GraphicsModel();
+
+    GraphicsNode previousNode = null;
+
     for (AminoAcid aminoAcid : normalizedModel.getProtein().getProteinChain()) {
       GraphicsNode node = graphicsModel.FindNode(aminoAcid.getPosition());
       if (node != null) {
@@ -65,6 +69,12 @@ public class GraphicLogic {
         node.getAminoAcids().add(aminoAcid);
         graphicsModel.AddNode(node);
       }
+
+      // Handle connections
+      if (previousNode != null) {
+        node.getConnections().add(new Vector2D(previousNode.getPosition()[0], previousNode.getPosition()[1]));
+      }
+      previousNode = node;
     }
     return graphicsModel;
   }
