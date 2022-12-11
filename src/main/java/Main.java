@@ -29,7 +29,7 @@ public class Main {
   }
 
   public static void testGA(){
-    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ12);
+    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ50);
     GraphicsUtil graphicsUtil = new GraphicsUtil();
     graphicsUtil.drawModel(individuals.getHpModel());
     graphicsUtil.save();

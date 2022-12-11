@@ -16,13 +16,16 @@ import java.util.List;
 
 public class GraphicsUtil {
   private int cellSize = 50;
-  private int cellPadding = 25;
-  private int canvasHeight = 500;
-  private int canvasWidth = 800;
+  private int cellPadding = 50;
+  private int canvasHeight = 1000;
+  private int canvasWidth = 1500;
   private BufferedImage image;
   private Graphics2D g2;
   private final int labelOffsetI = 5;
   private final int labelOffsetJ = -5;
+
+  // Booleans
+  private final boolean drawGrid = true;
 
 
   public GraphicsUtil(){
@@ -30,8 +33,8 @@ public class GraphicsUtil {
   }
 
   private void drawAtCoord(int i, int j, List<AminoAcid> aminoAcids){
-    int y = (i + 2) * (cellSize + cellPadding);
-    int x = (j + 2) * (cellSize + cellPadding);
+    int y = i * (cellSize + cellPadding);
+    int x = j * (cellSize + cellPadding);
     int offsetOverlapp = 5;
 
     for (int k = 0; k < aminoAcids.size(); k++) {
@@ -56,8 +59,8 @@ public class GraphicsUtil {
   private void drawLabel(int i, int j, List<AminoAcid> aminoAcids){
     final int offSetI = cellSize / 2;
     final int offSetJ = cellSize / 2;
-    int y = (i + 2) * (cellSize + cellPadding);
-    int x = (j + 2) * (cellSize + cellPadding);
+    int y = i * (cellSize + cellPadding);
+    int x = j * (cellSize + cellPadding);
 
     String label = "";
     for (AminoAcid aminoAcid : aminoAcids) {
@@ -71,10 +74,10 @@ public class GraphicsUtil {
   private void drawCellConnection(int fromI, int fromJ, int toI, int toJ){
     final int offSetI = cellSize / 2;
     final int offSetJ = cellSize / 2;
-    int fromY = ((fromI + 2) * (cellSize + cellPadding)) + offSetI;
-    int fromX = ((fromJ + 2) * (cellSize + cellPadding)) + offSetJ;
-    int toY = ((toI + 2) * (cellSize + cellPadding)) + offSetI;
-    int toX = ((toJ + 2) * (cellSize + cellPadding)) + offSetJ;
+    int fromY = fromI * (cellSize + cellPadding) + offSetI;
+    int fromX = fromJ * (cellSize + cellPadding) + offSetJ;
+    int toY = toI * (cellSize + cellPadding) + offSetI;
+    int toX = toJ * (cellSize + cellPadding) + offSetJ;
     g2.setColor(Color.RED);
     g2.setStroke(new BasicStroke(5));
     g2.drawLine(fromX, fromY, toX, toY);
@@ -84,7 +87,8 @@ public class GraphicsUtil {
   private void drawSampleGrid(int maxI, int maxJ){
     for (int i = 0; i <= maxI; i++) {
       for (int j = 0; j <= maxJ; j++) {
-        g2.drawRect(j * cellSize, i * cellSize, cellSize, cellSize);
+        g2.setColor(Color.blue);
+        g2.fillRect(j * cellSize + 1, i * cellSize + 1, cellSize - 2, cellSize - 2);
       }
     }
 //    save();
@@ -139,6 +143,9 @@ public class GraphicsUtil {
       }
     }
 */
+
+    if (drawGrid) { drawSampleGrid(canvasHeight / cellSize, canvasWidth / cellSize); }
+
     HPModel normalizedModel = GraphicLogic.normalize(foldedModel);
     GraphicLogic.sort(normalizedModel);
 
