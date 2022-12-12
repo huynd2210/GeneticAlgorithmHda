@@ -19,9 +19,9 @@ public class GeneticAlgorithm {
     Individual bestIndividual = findBestFitnessOfPopulation(currentPopulation);
 
     List<String[]> logs = new ArrayList<>();
-    logs.add(new String[]{"Generation", "Average fitness", "Best current fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids", "Best Folding", "Population"});
+    logs.add(new String[]{"Generation", "Average fitness", "Best current generation fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids", "Best current generation folding" ,"Best Folding", "Population"});
     for (int i = 0; i < MAX_GENERATIONS; i++) {
-      String[] dataLine = new String[8];
+      String[] dataLine = new String[9];
       dataLine[0] = String.valueOf(i);
       dataLine[1] = String.valueOf(findAverageFitnessOfPopulation(currentPopulation));
       Individual currentMostFit = findBestFitnessOfPopulation(currentPopulation);
@@ -33,14 +33,15 @@ public class GeneticAlgorithm {
       dataLine[3] = String.valueOf(bestIndividual.getFitness());
       dataLine[4] = Integer.toString(bestIndividual.getIndividualInformation().getNumberOfHHBonds());
       dataLine[5] = Integer.toString(bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size());
-      dataLine[6] = bestIndividual.getHpModel().getFolding().getFoldingDirection();
-      dataLine[7] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
+      dataLine[6] = currentMostFit.getHpModel().getFolding().getFoldingDirection();
+      dataLine[7] = bestIndividual.getHpModel().getFolding().getFoldingDirection();
+      dataLine[8] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
       logs.add(dataLine);
 
       currentPopulation = evolveNextGeneration(currentPopulation);
     }
 //    return currentPopulation;
-    Logger.write("C:\\Woodchop\\GeneticAlgorithmHda\\data.csv", logs);
+    Logger.write("data.csv", logs);
     return bestIndividual;
   }
 
@@ -89,7 +90,7 @@ public class GeneticAlgorithm {
     Individual firstParent = rouletteWheelSelection(oldPopulation);
 //    Individual secondParent = rouletteWheelSelection(oldPopulation);
 //    newPopulation.addAll(crossover(firstParent, secondParent));
-    newPopulation.add(firstParent);
+    newPopulation.add(new Individual(firstParent));
   }
 
   private static Individual rouletteWheelSelection(List<Individual> population) {

@@ -26,6 +26,9 @@ public class Main {
     graphicsUtil.drawModel(individuals.getHpModel());
     graphicsUtil.save();
     System.out.println(individuals);
+    System.out.println("HH Bonds: " + individuals.getIndividualInformation().getNumberOfHHBonds());
+    System.out.println("Number of overlapping amino acids: " + individuals.getIndividualInformation().getOverlappingAminoAcids().size());
+    System.out.println("Overlapping Amino Acids: " + individuals.getIndividualInformation().getOverlappingAminoAcids());
   }
 
   public static void testGA(){
@@ -45,6 +48,8 @@ public class Main {
     GraphicsUtil graphics = new GraphicsUtil();
     graphics.drawModel(hpModel);
     graphics.save();
+
+    Individual individuals = new Individual(hpModel);
 
     System.out.println(hpModel);
     System.out.println(Logic.getFitnessOld(hpModel));
@@ -67,7 +72,11 @@ public class Main {
   }
 
   public static void testOverlapping() {
-    test(Examples.SEQ7, "NWSSWNE");
+    test(Examples.SEQ24, "SWSNNEEWEEESWNSEENWSNNN");
+  }
+
+  public static void testSampleOverlapping(){
+    test(Examples.SEQ7, "NWSWESN");
   }
 
   public static void testNoOverlapping() {
@@ -128,8 +137,9 @@ public class Main {
 //    testOverlapping();
 //    testHashing();
 //    runGraphicExample();
-    testGA();
-//    new GraphicsUtil().drawAtCoord(1,2, "0");
+
+//    testSampleOverlapping();
+    runGA(Examples.SEQ24);
 
 
 

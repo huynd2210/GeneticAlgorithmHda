@@ -21,7 +21,9 @@ public class Logic {
     int numberOfHHBonds = 0;
 
     List<AminoAcid> hydrophobicAminoAcids = filterForHydrophobicAcids(individual.getHpModel());
-    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+//    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(individual.getHpModel().getProtein().getProteinChain());
+//    List<AminoAcid> overlappingAminoAcids = filterAllAminoAcidsForOverlappingAminoAcids(individual.getHpModel().get);
 
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
@@ -43,7 +45,8 @@ public class Logic {
     int numberOfHHBonds = 0;
 
     List<AminoAcid> hydrophobicAminoAcids = (filterForHydrophobicAcids(foldedModel));
-    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+//    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
+    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(foldedModel.getProtein().getProteinChain());
 
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
@@ -110,6 +113,22 @@ public class Logic {
     return hydrophobicAminoAcids;
   }
 
+  private static List<AminoAcid> filterAllAminoAcidsForOverlappingAminoAcids(List<AminoAcid> allAminoAcids){
+    List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
+    Set<Integer> positionsHashes = new HashSet<>();
+    for (AminoAcid hydrophobicAminoAcid : allAminoAcids) {
+      int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
+      if (!positionsHashes.contains(positionHash)) {
+        positionsHashes.add(positionHash);
+      } else {
+        overlappingAminoAcids.add(hydrophobicAminoAcid);
+        hydrophobicAminoAcid.setOverlapping(true);
+      }
+    }
+    return overlappingAminoAcids;
+  }
+
+  //check for hydrophobic overlappings
   private static List<AminoAcid> filterForOverlappingAminoAcids(List<AminoAcid> hydrophobicAminoAcids) {
     List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
     Set<Integer> positionsHashes = new HashSet<>();

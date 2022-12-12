@@ -25,7 +25,10 @@ public class IndividualInformation {
   }
 
   public IndividualInformation(IndividualInformation copy) {
-    this.overlappingAminoAcids = copy.getOverlappingAminoAcids();
+    this.overlappingAminoAcids = new ArrayList<>();
+    for (AminoAcid overlappingAminoAcid : copy.getOverlappingAminoAcids()) {
+      this.overlappingAminoAcids.add(new AminoAcid(overlappingAminoAcid));
+    }
     this.numberOfHHBonds = copy.getNumberOfHHBonds();
   }
 }

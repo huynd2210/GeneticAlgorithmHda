@@ -25,7 +25,7 @@ public class GraphicsUtil {
   private final int labelOffsetJ = -5;
 
   // Booleans
-  private final boolean drawGrid = true;
+  private final boolean drawGrid = false;
 
 
   public GraphicsUtil(){
