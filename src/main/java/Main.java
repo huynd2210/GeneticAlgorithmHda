@@ -5,6 +5,7 @@ import model.HPModel;
 import model.Individual;
 import model.Protein;
 import graphics.GraphicsUtil;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -137,9 +138,8 @@ public class Main {
 //    runGraphicExample();
 
 //    testSampleOverlapping();
-    runGA(Examples.SEQ24);
-
-
+//    runGA(Examples.SEQ24);
+    System.out.println(CombinatoricsUtils.binomialCoefficient(5, 2));
 
 
   }

@@ -9,11 +9,11 @@ import java.util.List;
 @Getter
 @Setter
 public class IndividualInformation {
-  private List<AminoAcid> overlappingAminoAcids;
+  private List<List<AminoAcid>> overlappingAminoAcids;
   private Integer numberOfHHBonds;
 
   public IndividualInformation(
-          List<AminoAcid> overlappingAminoAcids,
+          List<List<AminoAcid>> overlappingAminoAcids,
           Integer numberOfHHBonds) {
     this.overlappingAminoAcids = overlappingAminoAcids;
     this.numberOfHHBonds = numberOfHHBonds;
@@ -26,8 +26,15 @@ public class IndividualInformation {
 
   public IndividualInformation(IndividualInformation copy) {
     this.overlappingAminoAcids = new ArrayList<>();
-    for (AminoAcid overlappingAminoAcid : copy.getOverlappingAminoAcids()) {
-      this.overlappingAminoAcids.add(new AminoAcid(overlappingAminoAcid));
+//    for (AminoAcid overlappingAminoAcid : copy.getOverlappingAminoAcids()) {
+//      this.overlappingAminoAcids.add(new AminoAcid(overlappingAminoAcid));
+//    }
+    for (List<AminoAcid> overlappingAminoAcid : overlappingAminoAcids) {
+      List<AminoAcid> copying = new ArrayList<>();
+      for (AminoAcid aminoAcid : overlappingAminoAcid) {
+        copying.add(new AminoAcid(aminoAcid));
+      }
+        this.overlappingAminoAcids.add(copying);
     }
     this.numberOfHHBonds = copy.getNumberOfHHBonds();
   }

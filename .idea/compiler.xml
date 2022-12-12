@@ -13,7 +13,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="GeneticAlgorithmHda" options="--add-modules java.base,java.desktop" />
+      <module name="GeneticAlgorithmHda" options="" />
     </option>
   </component>
 </project>

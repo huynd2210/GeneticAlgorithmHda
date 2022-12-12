@@ -4,15 +4,13 @@ import model.AminoAcid;
 import model.Folding;
 import model.HPModel;
 import model.Individual;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class Logic {
-  private static final boolean isLogging = false;
+  private static final boolean isLogging = true;
   private Logic() {
   }
 
@@ -22,7 +20,7 @@ public class Logic {
 
     List<AminoAcid> hydrophobicAminoAcids = filterForHydrophobicAcids(individual.getHpModel());
 //    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
-    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(individual.getHpModel().getProtein().getProteinChain());
+    List<List<AminoAcid>> overlappingAminoAcids = filterForOverlappingAminoAcids(individual.getHpModel().getProtein().getProteinChain());
 //    List<AminoAcid> overlappingAminoAcids = filterAllAminoAcidsForOverlappingAminoAcids(individual.getHpModel().get);
 
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
@@ -46,7 +44,7 @@ public class Logic {
 
     List<AminoAcid> hydrophobicAminoAcids = (filterForHydrophobicAcids(foldedModel));
 //    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(hydrophobicAminoAcids);
-    List<AminoAcid> overlappingAminoAcids = filterForOverlappingAminoAcids(foldedModel.getProtein().getProteinChain());
+    List<List<AminoAcid>> overlappingAminoAcids = filterForOverlappingAminoAcids(foldedModel.getProtein().getProteinChain());
 
     for (int i = 0; i < hydrophobicAminoAcids.size() - 1; i++) {
       for (int j = i + 1; j < hydrophobicAminoAcids.size(); j++) {
@@ -113,36 +111,54 @@ public class Logic {
     return hydrophobicAminoAcids;
   }
 
-  private static List<AminoAcid> filterAllAminoAcidsForOverlappingAminoAcids(List<AminoAcid> allAminoAcids){
-    List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
-    Set<Integer> positionsHashes = new HashSet<>();
-    for (AminoAcid hydrophobicAminoAcid : allAminoAcids) {
-      int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
-      if (!positionsHashes.contains(positionHash)) {
-        positionsHashes.add(positionHash);
-      } else {
-        overlappingAminoAcids.add(hydrophobicAminoAcid);
-        hydrophobicAminoAcid.setOverlapping(true);
+  private static int countOverlappings(List<List<AminoAcid>> overlappingAminoAcids){
+    //count the number of element in a cartesian product of the inner list
+    CombinatoricsUtils.binomialCoefficient(5,2);
+    return 0;
+  }
+
+  private static List<List<AminoAcid>> filterForOverlappingAminoAcids(List<AminoAcid> allAminoAcids) {
+    List<List<AminoAcid>> overlappingAminoAcids = new ArrayList<>();
+
+    Map<Integer, List<AminoAcid>> positionsHashes = new HashMap<>();
+    for (AminoAcid aminoAcid : allAminoAcids) {
+      int positionHash = hashPosition(aminoAcid.getPosition());
+      positionsHashes.computeIfAbsent(positionHash, k -> new ArrayList<>()).add(aminoAcid);
+
+//      if (!positionsHashes.containsKey(positionHash)) {
+//        List<AminoAcid> tmp = new ArrayList<>();
+//        tmp.add(aminoAcid);
+//        positionsHashes.put(positionHash, tmp);
+//      }
+    }
+
+    for (List<AminoAcid> aminoAcids : positionsHashes.values()) {
+      if (aminoAcids.size() > 1){
+        for (AminoAcid aminoAcid : aminoAcids) {
+          aminoAcid.setOverlapping(true);
+        }
+        overlappingAminoAcids.add(aminoAcids);
       }
     }
+
     return overlappingAminoAcids;
   }
 
-  //check for hydrophobic overlappings
-  private static List<AminoAcid> filterForOverlappingAminoAcids(List<AminoAcid> hydrophobicAminoAcids) {
-    List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
-    Set<Integer> positionsHashes = new HashSet<>();
-    for (AminoAcid hydrophobicAminoAcid : hydrophobicAminoAcids) {
-      int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
-      if (!positionsHashes.contains(positionHash)) {
-        positionsHashes.add(positionHash);
-      } else {
-        overlappingAminoAcids.add(hydrophobicAminoAcid);
-        hydrophobicAminoAcid.setOverlapping(true);
-      }
-    }
-    return overlappingAminoAcids;
-  }
+  //check for overlappings
+//  private static List<AminoAcid> filterForOverlappingAminoAcids(List<AminoAcid> allAminoAcids) {
+//    List<AminoAcid> overlappingAminoAcids = new ArrayList<>();
+//    Set<Integer> positionsHashes = new HashSet<>();
+//    for (AminoAcid hydrophobicAminoAcid : allAminoAcids) {
+//      int positionHash = hashPosition(hydrophobicAminoAcid.getPosition());
+//      if (!positionsHashes.contains(positionHash)) {
+//        positionsHashes.add(positionHash);
+//      } else {
+//        overlappingAminoAcids.add(hydrophobicAminoAcid);
+//        hydrophobicAminoAcid.setOverlapping(true);
+//      }
+//    }
+//    return overlappingAminoAcids;
+//  }
 
   public static Integer hashPosition(Integer[] position) {
     //choosing large prime for less collisions
