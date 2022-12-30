@@ -160,10 +160,18 @@ public class Logic {
 //    return overlappingAminoAcids;
 //  }
 
-  public static Integer hashPosition(Integer[] position) {
+  public static Integer hashPositionOld(Integer[] position) {
     //choosing large prime for less collisions
     final int prime = 773;
     return (position[0] * prime) + position[1];
+  }
+
+
+  public static Integer hashPosition(Integer[] position){
+    int offset = 1000;
+    position[0] += offset;
+    position[1] += offset;
+    return (position[0] + position[1]) * (position[0] + position[1] + 1) / 2 + position[1];
   }
 
   private static Integer[] move(char direction, Integer[] position) {
