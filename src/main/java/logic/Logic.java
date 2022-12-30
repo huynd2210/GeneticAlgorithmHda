@@ -34,7 +34,9 @@ public class Logic {
     individual.getIndividualInformation().setOverlappingAminoAcids(overlappingAminoAcids);
     individual.getIndividualInformation().setNumberOfHHBonds(numberOfHHBonds);
 
-    fitness = fitness + ((double) numberOfHHBonds / (overlappingAminoAcids.size() + 1));
+    int overlappingScore = countOverlappings(overlappingAminoAcids);
+
+    fitness = fitness + ((double) numberOfHHBonds / (overlappingScore + 1));
     individual.setFitness(fitness);
   }
 
@@ -112,9 +114,12 @@ public class Logic {
   }
 
   private static int countOverlappings(List<List<AminoAcid>> overlappingAminoAcids){
+    int total = 0;
     //count the number of element in a cartesian product of the inner list
-    CombinatoricsUtils.binomialCoefficient(5,2);
-    return 0;
+    for (List<AminoAcid> overlappingAminoAcid : overlappingAminoAcids) {
+      total += CombinatoricsUtils.binomialCoefficient(overlappingAminoAcid.size(), 2);
+    }
+    return total;
   }
 
   private static List<List<AminoAcid>> filterForOverlappingAminoAcids(List<AminoAcid> allAminoAcids) {
