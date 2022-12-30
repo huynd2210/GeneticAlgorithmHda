@@ -24,7 +24,12 @@ public class GeneticAlgorithm {
     Individual bestIndividual = findBestFitnessOfPopulation(currentPopulation);
 
     List<String[]> logs = new ArrayList<>();
-    logs.add(new String[]{"Generation", "Average fitness", "Best current generation fitness", "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids", "Best current generation folding" ,"Best Folding", "Population"});
+    logs.add(new String[]
+            {
+                    "Generation", "Average fitness", "Best current generation fitness",
+                    "Best fitness overall", "H/H Bonds", "Overlapping Amino Acids",
+                    "Best current generation folding" ,"Best Folding", "Population"}
+    );
     for (int i = 0; i < MAX_GENERATIONS; i++) {
       String[] dataLine = new String[9];
       dataLine[0] = String.valueOf(i);
@@ -33,7 +38,8 @@ public class GeneticAlgorithm {
       dataLine[2] = String.valueOf(currentMostFit.getFitness());
 
       if (currentMostFit.getFitness() > bestIndividual.getFitness()) {
-        bestIndividual = currentMostFit;
+        bestIndividual = new Individual(currentMostFit);
+//        bestIndividual = currentMostFit;
       }
       dataLine[3] = String.valueOf(bestIndividual.getFitness());
       dataLine[4] = Integer.toString(bestIndividual.getIndividualInformation().getNumberOfHHBonds());

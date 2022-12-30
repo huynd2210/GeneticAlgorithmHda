@@ -33,7 +33,7 @@ public class Main {
   }
 
   public static void testGA(){
-    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ50);
+    Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ24);
     GraphicsUtil graphicsUtil = new GraphicsUtil();
     graphicsUtil.drawModel(individuals.getHpModel());
     graphicsUtil.save();
@@ -132,6 +132,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
+    testGA();
 //    testNoOverlapping();
 //    testOverlapping();
 //    testHashing();
@@ -139,7 +140,7 @@ public class Main {
 
 //    testSampleOverlapping();
 //    runGA(Examples.SEQ24);
-    System.out.println(CombinatoricsUtils.binomialCoefficient(5, 2));
+//    System.out.println(CombinatoricsUtils.binomialCoefficient(5, 2));
 
 
   }

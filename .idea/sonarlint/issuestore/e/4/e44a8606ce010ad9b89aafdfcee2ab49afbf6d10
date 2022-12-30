@@ -1,20 +1,0 @@
-
-0
-java:S1220""Move this file to a named package.
-Z	java:S106"9Replace this use of System.out or System.err by a logger.(Ÿ–ıÿÿÿÿ8ª˜âğĞ0
-Z	java:S106"9Replace this use of System.out or System.err by a logger.(‹È¯­øÿÿÿÿ8«˜âğĞ0
-U	java:S106"9Replace this use of System.out or System.err by a logger.(¿›¢—8¬˜âğĞ0
-U	java:S106 "9Replace this use of System.out or System.err by a logger.(û…Ä8±˜âğĞ0
-Z	java:S106("9Replace this use of System.out or System.err by a logger.(Ÿ–ıÿÿÿÿ8Á˜âğĞ0
-\
-java:S18545"?Remove this useless assignment to local variable "individuals".(Ç³‡è8Â˜âğĞ0
-M
-java:S14815"0Remove this unused "individuals" local variable.(Ç³‡è8Ç˜âğĞ0
-U	java:S1067"9Replace this use of System.out or System.err by a logger.(î¿Ş8Ò˜âğĞ0
-T	java:S1068"9Replace this use of System.out or System.err by a logger.(ˆÃŒu8á˜âğĞ0
-U	java:S106C"9Replace this use of System.out or System.err by a logger.(˜İç«8ë˜âğĞ0
-I
-java:S1125z"'Remove the unnecessary boolean literal.(ËĞÿÉşÿÿÿÿ8†™âğĞ0
-V	java:S106"9Replace this use of System.out or System.err by a logger.(¹à³Ì8™âğĞ0
-^	java:S125‡"<This block of commented-out lines of code should be removed.(¼ºÅúÿÿÿÿÿ8™âğĞ0
-X	java:S125Œ"<This block of commented-out lines of code should be removed.(¨ıã!8‘™âğĞ0

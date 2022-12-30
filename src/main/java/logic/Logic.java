@@ -173,10 +173,11 @@ public class Logic {
 
 
   public static Integer hashPosition(Integer[] position){
-    int offset = 1000;
-    position[0] += offset;
-    position[1] += offset;
-    return (position[0] + position[1]) * (position[0] + position[1] + 1) / 2 + position[1];
+    //cantor pairing function with offset for negative values
+    final int offset = 1000;
+    int i = position[0] + offset;
+    int j = position[1] + offset;
+      return (i + j) * (i + j + 1) / 2 + j;
   }
 
   private static Integer[] move(char direction, Integer[] position) {
