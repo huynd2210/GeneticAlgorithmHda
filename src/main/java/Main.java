@@ -119,7 +119,7 @@ public class Main {
 
     String folder = ".";
     String filename = "sample graphic.png";
-    if (new File(folder).exists() == false) new File(folder).mkdirs();
+    if (!new File(folder).exists()) new File(folder).mkdirs();
 
     try {
       ImageIO.write(image, "png", new File(folder + File.separator + filename));

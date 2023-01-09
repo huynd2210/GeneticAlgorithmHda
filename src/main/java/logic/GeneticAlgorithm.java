@@ -12,10 +12,13 @@ public class GeneticAlgorithm {
   private static final int MAX_GENERATIONS = 100;
   private static final Random r = new Random();
   private static double MUTATION_RATE = 0.02;
+  private static double FINAL_MUTATION_RATE = 0.1;
 
   private GeneticAlgorithm(){
 
   }
+
+
 
   public static Individual runGeneticAlgorithm(String targetProtein) {
     //generate and evaluate initial population
@@ -162,6 +165,10 @@ public class GeneticAlgorithm {
       }
     }
     individual.getHpModel().getFolding().setFoldingDirection(sb.toString());
+  }
+
+  private static double getMutationRate(int currentGeneration, int maxGeneration, double initialRate, double finalRate) {
+    return initialRate + (finalRate - initialRate) * currentGeneration / maxGeneration;
   }
 
   private static List<Individual> initPopulation(String protein) {
