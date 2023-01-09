@@ -1,9 +1,6 @@
 import logic.GeneticAlgorithm;
 import logic.Logic;
-import model.Folding;
-import model.HPModel;
-import model.Individual;
-import model.Protein;
+import model.*;
 import graphics.GraphicsUtil;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 
@@ -16,12 +13,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 public class Main {
-  public static void runGA(String proteinSequence){
+  public static void runGA(String proteinSequence) throws Exception {
     Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(proteinSequence);
     GraphicsUtil graphicsUtil = new GraphicsUtil();
     graphicsUtil.drawModel(individuals.getHpModel());
@@ -32,7 +30,7 @@ public class Main {
     System.out.println("Overlapping Amino Acids: " + individuals.getIndividualInformation().getOverlappingAminoAcids());
   }
 
-  public static void testGA(){
+  public static void testGA() throws Exception {
     Individual individuals = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ24);
     GraphicsUtil graphicsUtil = new GraphicsUtil();
     graphicsUtil.drawModel(individuals.getHpModel());
@@ -131,8 +129,11 @@ public class Main {
 
   }
 
-  public static void main(String[] args) {
-    testGA();
+  public static void main(String[] args) throws Exception {
+    testIndividualCopyCorrectness();
+
+//    testGA();
+//    testFilterOverlapping();
 //    testNoOverlapping();
 //    testOverlapping();
 //    testHashing();
@@ -143,5 +144,22 @@ public class Main {
 //    System.out.println(CombinatoricsUtils.binomialCoefficient(5, 2));
 
 
+  }
+
+  private static void testIndividualCopyCorrectness() throws Exception {
+    Individual individual = GeneticAlgorithm.runGeneticAlgorithm(Examples.SEQ24);
+    individual.getIndividualInformation().setOverlappingAminoAcids(List.of(individual.getHpModel().getProtein().getProteinChain()));
+    System.out.println(individual);
+    Individual tmp = new Individual(individual);
+    System.out.println(tmp);
+    System.out.println("asdjsd");
+  }
+
+
+  public static void testFilterOverlapping(){
+    HPModel hpModel = new HPModel(new Protein(Examples.SEQ25), new Folding("ESSWNSWWNENWNWSWSSESWWNN"));
+    Logic.fold(hpModel);
+    List<List<AminoAcid>> lists = Logic.filterForOverlappingAminoAcids(hpModel.getProtein().getProteinChain());
+    System.out.println(lists);
   }
 }

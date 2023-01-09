@@ -29,7 +29,7 @@ public class IndividualInformation {
 //    for (AminoAcid overlappingAminoAcid : copy.getOverlappingAminoAcids()) {
 //      this.overlappingAminoAcids.add(new AminoAcid(overlappingAminoAcid));
 //    }
-    for (List<AminoAcid> overlappingAminoAcid : overlappingAminoAcids) {
+    for (List<AminoAcid> overlappingAminoAcid : copy.overlappingAminoAcids) {
       List<AminoAcid> copying = new ArrayList<>();
       for (AminoAcid aminoAcid : overlappingAminoAcid) {
         copying.add(new AminoAcid(aminoAcid));

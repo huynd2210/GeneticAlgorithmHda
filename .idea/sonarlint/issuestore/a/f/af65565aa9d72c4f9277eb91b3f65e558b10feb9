@@ -1,0 +1,19 @@
+
+2
+java:S1643C"Use a StringBuilder instead.(½¦ÑÔ
+<
+java:S1170"!Make this final field static too.(úÕü‘úÿÿÿÿ
+7
+java:S1170"!Make this final field static too.(Ó™¨Ö
+<
+java:S1170"!Make this final field static too.(¶Õþßþÿÿÿÿ
+Q	java:S1256"<This block of commented-out lines of code should be removed.(ï§à
+V	java:S125^"<This block of commented-out lines of code should be removed.(òÍäÌüÿÿÿÿ
+P	java:S125r"<This block of commented-out lines of code should be removed.(ýàÃ
+R	java:S125±"<This block of commented-out lines of code should be removed.(ñ¨á·
+C
+java:S1128"(Remove this unused import 'logic.Logic'.(Œ®…‡üÿÿÿÿ
+U
+java:S1144¶"9Remove this unused private "drawHydrophillicAcid" method.(Ùæìúÿÿÿÿ
+O
+java:S1144»"8Remove this unused private "drawHydrophobicAcid" method.(³Ç½û

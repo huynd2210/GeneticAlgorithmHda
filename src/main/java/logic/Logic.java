@@ -10,7 +10,7 @@ import java.util.*;
 
 
 public class Logic {
-  private static final boolean isLogging = true;
+  private static final boolean isLogging = false;
   private Logic() {
   }
 
@@ -122,7 +122,7 @@ public class Logic {
     return total;
   }
 
-  private static List<List<AminoAcid>> filterForOverlappingAminoAcids(List<AminoAcid> allAminoAcids) {
+  public static List<List<AminoAcid>> filterForOverlappingAminoAcids(List<AminoAcid> allAminoAcids) {
     List<List<AminoAcid>> overlappingAminoAcids = new ArrayList<>();
 
     Map<Integer, List<AminoAcid>> positionsHashes = new HashMap<>();
