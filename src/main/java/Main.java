@@ -130,9 +130,19 @@ public class Main {
   }
 
   public static void main(String[] args) throws Exception {
-    testIndividualCopyCorrectness();
+//    testIndividualCopyCorrectness();
 
-//    testGA();
+
+//    Individual a = new Individual(Examples.SEQ24, "SSWNSENNSESSENSEWSENNNW");
+//    Individual b = new Individual(Examples.SEQ24, "SSWNSENNSESSENSEWWEESSN");
+//    Logic.fold(a.getHpModel());
+//    Logic.fold(b.getHpModel());
+//    Logic.evaluateFitness(a);
+//    Logic.evaluateFitness(b);
+//
+//    System.out.println("sads");
+
+    testGA();
 //    testFilterOverlapping();
 //    testNoOverlapping();
 //    testOverlapping();
@@ -157,7 +167,7 @@ public class Main {
 
 
   public static void testFilterOverlapping(){
-    HPModel hpModel = new HPModel(new Protein(Examples.SEQ25), new Folding("ESSWNSWWNENWNWSWSSESWWNN"));
+    HPModel hpModel = new HPModel(new Protein(Examples.SEQ24), new Folding("ESSWNSWWNENWNWSWSSESWWNN"));
     Logic.fold(hpModel);
     List<List<AminoAcid>> lists = Logic.filterForOverlappingAminoAcids(hpModel.getProtein().getProteinChain());
     System.out.println(lists);

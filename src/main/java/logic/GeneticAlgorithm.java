@@ -5,11 +5,11 @@ import model.Individual;
 import java.util.*;
 
 public class GeneticAlgorithm {
-    private static final int POPULATION_SIZE = 1000;
+    private static final int POPULATION_SIZE = 200;
     private static final int MAX_GENERATIONS = 100;
     private static final Random r = new Random();
-    private static double MUTATION_RATE = 0.01;
-    private static double FINAL_MUTATION_RATE = 0.001;
+    private static double MUTATION_RATE = 0.005;
+    private static double FINAL_MUTATION_RATE = 0.005;
 
     private GeneticAlgorithm() {
 
@@ -51,7 +51,7 @@ public class GeneticAlgorithm {
 
 
             int correctnessCheckOverlapping = Logic.filterForOverlappingAminoAcids(bestIndividual.getHpModel().getProtein().getProteinChain()).size();
-            if (correctnessCheckOverlapping != bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size()){
+            if (correctnessCheckOverlapping != bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size()) {
                 System.out.println("ERROR: Overlapping amino acids are not correct!, " + correctnessCheckOverlapping + " != " + bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size());
             }
 
@@ -61,6 +61,7 @@ public class GeneticAlgorithm {
             dataLine[8] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
             double mutationRate = getMutationRate(i, MAX_GENERATIONS, MUTATION_RATE, FINAL_MUTATION_RATE);
             dataLine[9] = String.valueOf(mutationRate);
+//            dataLine[10] = String.valueOf(calculatePopulationDiversity(currentPopulation));
             logs.add(dataLine);
 
             currentPopulation = evolveNextGeneration(currentPopulation, i);
@@ -92,6 +93,7 @@ public class GeneticAlgorithm {
         List<Individual> newPopulation = makeOffspring(currentGenerationPopulation);
         for (Individual individual : newPopulation) {
             mutate(individual, mutationRate);
+//            noMutate(individual, mutationRate);
         }
         return newPopulation;
     }
@@ -115,7 +117,8 @@ public class GeneticAlgorithm {
         for (int i = 0; i < currentGenerationPopulation.size(); i += 2) {
             Individual firstParent = selectedForReproduction.get(i);
             Individual secondParent = selectedForReproduction.get(i + 1);
-            nextGeneration.addAll(crossover(firstParent, secondParent));
+            nextGeneration.addAll(crossover(firstParent, secondParent, 0));
+//            nextGeneration.addAll(copyBestCrossover(firstParent, secondParent));
         }
         return nextGeneration;
     }
@@ -123,33 +126,10 @@ public class GeneticAlgorithm {
     private static List<Individual> selectForReproduction(List<Individual> currentGenerationPopulation) throws Exception {
         List<Individual> selectedForReproduction = new ArrayList<>();
         for (int i = 0; i < currentGenerationPopulation.size(); i++) {
-            selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
+//            selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
+            selectedForReproduction.add(Collections.max(currentGenerationPopulation, Comparator.comparing(Individual::getFitness)));
         }
         return selectedForReproduction;
-    }
-
-    public static Individual select(Individual[] population, double[] fitnesses) {
-        double totalFitness = 0;
-        for (double f : fitnesses) {
-            totalFitness += f;
-        }
-        double[] normalizedFitnesses = new double[fitnesses.length];
-        for (int i = 0; i < fitnesses.length; i++) {
-            normalizedFitnesses[i] = fitnesses[i] / totalFitness;
-        }
-        double[] accumulatedFitnesses = new double[normalizedFitnesses.length];
-        accumulatedFitnesses[0] = normalizedFitnesses[0];
-        for (int i = 1; i < normalizedFitnesses.length; i++) {
-            accumulatedFitnesses[i] = accumulatedFitnesses[i - 1] + normalizedFitnesses[i];
-        }
-        Random r = new Random();
-        double rnd = r.nextDouble();
-        for (int i = 0; i < accumulatedFitnesses.length; i++) {
-            if (rnd < accumulatedFitnesses[i]) {
-                return population[i];
-            }
-        }
-        return null;
     }
 
 
@@ -201,7 +181,16 @@ public class GeneticAlgorithm {
     }
 
     //1-point crossover
-    private static List<Individual> crossover(Individual firstParent, Individual secondParent) {
+    private static List<Individual> crossover(Individual firstParent, Individual secondParent, int trial) {
+        int timeout = 15;
+        if (trial > timeout) {
+            System.out.println("Trial timed out, readding parents");
+            List<Individual> children = new ArrayList<>();
+            children.add(firstParent);
+            children.add(secondParent);
+            return children;
+        }
+
         List<Individual> children = new ArrayList<>();
         int crossoverPoint = r.nextInt(firstParent.getHpModel().getFolding().getFoldingDirection().length());
         Individual firstChild = new Individual(firstParent,
@@ -210,9 +199,79 @@ public class GeneticAlgorithm {
         Individual secondChild = new Individual(secondParent,
                 secondParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint)
                         + firstParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint));
-        children.add(firstChild);
-        children.add(secondChild);
+
+        Logic.fold(firstChild.getHpModel());
+        Logic.fold(secondChild.getHpModel());
+        Logic.evaluateFitness(firstChild);
+        Logic.evaluateFitness(secondChild);
+
+        boolean firstChildGood = false;
+        boolean secondChildGood = false;
+
+        if (firstChild.getFitness() >= firstParent.getFitness() && firstChild.getFitness() >= secondParent.getFitness()) {
+            firstChildGood = true;
+        }
+
+        if (secondChild.getFitness() >= firstParent.getFitness() && secondChild.getFitness() >= secondParent.getFitness()) {
+            secondChildGood = true;
+        }
+
+        if (firstChildGood && secondChildGood) {
+            children.add(firstChild);
+            children.add(secondChild);
+        } else if (firstChildGood) {
+            children.add(firstChild);
+            children.add(firstChild);
+        } else if (secondChildGood) {
+            children.add(secondChild);
+            children.add(secondChild);
+        } else {
+            return crossover(firstParent, secondParent, trial + 1);
+        }
+
+//        children.add(firstChild);
+//        children.add(secondChild);
         return children;
+    }
+
+    private static void evaluateCrossover(Individual firstParent, Individual secondParent) {
+        Map<Integer, Double[]> crossoverPointFitnessValueMap = new HashMap<>();
+        int crossoverPoint = 0;
+        for (int i = 0; i < firstParent.getHpModel().getFolding().getFoldingDirection().length(); i++) {
+            crossoverPoint = i;
+            Individual firstChild = new Individual(firstParent,
+                    firstParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint)
+                            + secondParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint));
+            Individual secondChild = new Individual(secondParent,
+                    secondParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint)
+                            + firstParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint));
+            Logic.fold(firstChild.getHpModel());
+            Logic.fold(secondChild.getHpModel());
+            Logic.evaluateFitness(firstChild);
+            Logic.evaluateFitness(secondChild);
+            Double[] fitnessValues = new Double[2];
+            fitnessValues[0] = firstChild.getFitness();
+            fitnessValues[1] = secondChild.getFitness();
+            crossoverPointFitnessValueMap.put(crossoverPoint, fitnessValues);
+        }
+
+    }
+
+    private static List<Individual> copyBestCrossover(Individual firstParent, Individual secondParent) {
+        List<Individual> children = new ArrayList<>();
+        if (firstParent.getFitness() > secondParent.getFitness()) {
+            children.add(new Individual(firstParent));
+            children.add(new Individual(firstParent));
+        } else {
+            children.add(new Individual(secondParent));
+            children.add(new Individual(secondParent));
+        }
+        return children;
+    }
+
+
+    private static void noMutate(Individual individual, double mutationRate) {
+        return;
     }
 
     private static void mutate(Individual individual, double mutationRate) {
@@ -249,4 +308,25 @@ public class GeneticAlgorithm {
         }
         return sb.toString();
     }
+
+//    private static int calculateSubstitutionDistance(Individual first, Individual second){
+//        int distance = 0;
+//        for (int i = 0; i < first.getHpModel().getFolding().getFoldingDirection().length(); i++) {
+//            if (first.getHpModel().getFolding().getFoldingDirection().charAt(i) != second.getHpModel().getFolding().getFoldingDirection().charAt(i)) {
+//                distance++;
+//            }
+//        }
+//        return distance;
+//    }
+//
+//    private static double calculatePopulationDiversity(List<Individual> population){
+//        double diversitySum = 0;
+//        for (int i = 0; i < population.size(); i++) {
+//            for (int j = i + 1; j < population.size(); j++) {
+//                int distance = calculateSubstitutionDistance(population.get(i), population.get(j));
+//                diversitySum += distance;
+//            }
+//        }
+//        return diversitySum / (population.size() * (population.size() - 1) / 2);
+//    }
 }
