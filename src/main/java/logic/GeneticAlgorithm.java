@@ -3,6 +3,8 @@ package logic;
 import model.Individual;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GeneticAlgorithm {
     private static final int POPULATION_SIZE = 200;
@@ -48,7 +50,6 @@ public class GeneticAlgorithm {
             if (!Objects.equals(fitnessCorrectness.getFitness(), bestIndividual.getFitness())) {
                 System.out.println("Fitness is not correct, fitness: " + bestIndividual.getFitness() + " correct fitness: " + fitnessCorrectness.getFitness());
             }
-
 
             int correctnessCheckOverlapping = Logic.filterForOverlappingAminoAcids(bestIndividual.getHpModel().getProtein().getProteinChain()).size();
             if (correctnessCheckOverlapping != bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size()) {
@@ -117,8 +118,10 @@ public class GeneticAlgorithm {
         for (int i = 0; i < currentGenerationPopulation.size(); i += 2) {
             Individual firstParent = selectedForReproduction.get(i);
             Individual secondParent = selectedForReproduction.get(i + 1);
-            nextGeneration.addAll(crossover(firstParent, secondParent, 0));
+
+//            nextGeneration.addAll(crossover(firstParent, secondParent, 0));
 //            nextGeneration.addAll(copyBestCrossover(firstParent, secondParent));
+            nextGeneration.addAll(selectiveCrossover(firstParent, secondParent));
         }
         return nextGeneration;
     }
@@ -126,8 +129,8 @@ public class GeneticAlgorithm {
     private static List<Individual> selectForReproduction(List<Individual> currentGenerationPopulation) throws Exception {
         List<Individual> selectedForReproduction = new ArrayList<>();
         for (int i = 0; i < currentGenerationPopulation.size(); i++) {
-//            selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
-            selectedForReproduction.add(Collections.max(currentGenerationPopulation, Comparator.comparing(Individual::getFitness)));
+            selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
+//            selectedForReproduction.add(Collections.max(currentGenerationPopulation, Comparator.comparing(Individual::getFitness)));
         }
         return selectedForReproduction;
     }
@@ -181,16 +184,7 @@ public class GeneticAlgorithm {
     }
 
     //1-point crossover
-    private static List<Individual> crossover(Individual firstParent, Individual secondParent, int trial) {
-        int timeout = 15;
-        if (trial > timeout) {
-            System.out.println("Trial timed out, readding parents");
-            List<Individual> children = new ArrayList<>();
-            children.add(firstParent);
-            children.add(secondParent);
-            return children;
-        }
-
+    private static List<Individual> crossover(Individual firstParent, Individual secondParent) {
         List<Individual> children = new ArrayList<>();
         int crossoverPoint = r.nextInt(firstParent.getHpModel().getFolding().getFoldingDirection().length());
         Individual firstChild = new Individual(firstParent,
@@ -205,40 +199,35 @@ public class GeneticAlgorithm {
         Logic.evaluateFitness(firstChild);
         Logic.evaluateFitness(secondChild);
 
-        boolean firstChildGood = false;
-        boolean secondChildGood = false;
 
-        if (firstChild.getFitness() >= firstParent.getFitness() && firstChild.getFitness() >= secondParent.getFitness()) {
-            firstChildGood = true;
-        }
-
-        if (secondChild.getFitness() >= firstParent.getFitness() && secondChild.getFitness() >= secondParent.getFitness()) {
-            secondChildGood = true;
-        }
-
-        if (firstChildGood && secondChildGood) {
-            children.add(firstChild);
-            children.add(secondChild);
-        } else if (firstChildGood) {
-            children.add(firstChild);
-            children.add(firstChild);
-        } else if (secondChildGood) {
-            children.add(secondChild);
-            children.add(secondChild);
-        } else {
-            return crossover(firstParent, secondParent, trial + 1);
-        }
-
-//        children.add(firstChild);
-//        children.add(secondChild);
+        children.add(firstChild);
+        children.add(secondChild);
         return children;
     }
 
-    private static void evaluateCrossover(Individual firstParent, Individual secondParent) {
-        Map<Integer, Double[]> crossoverPointFitnessValueMap = new HashMap<>();
+    private static List<Individual> selectiveCrossover(Individual firstParent, Individual secondParent){
+        Map<Integer, Individual[]> children = evaluateAllOffspring(firstParent, secondParent);
+        OptionalDouble average = children.values().stream().mapToDouble(f -> (f[0].getFitness() + f[1].getFitness())/2).average();
+        System.out.println(average);
+
+        for (Individual[] value : children.values()) {
+            System.out.println(value[0].getFitness());
+            System.out.println(value[1].getFitness());
+        }
+
+        List<Individual> sortedChildren = children.values().stream().flatMap(Arrays::stream).sorted(Comparator.comparing(Individual::getFitness)).collect(Collectors.toList());
+
+        return sortedChildren.subList(1,3);
+    }
+
+    private static Map<Integer, Individual[]> evaluateAllOffspring(Individual firstParent, Individual secondParent) {
+        Map<Integer, Individual[]> crossoverPointFitnessValueMap = new HashMap<>();
         int crossoverPoint = 0;
         for (int i = 0; i < firstParent.getHpModel().getFolding().getFoldingDirection().length(); i++) {
             crossoverPoint = i;
+
+            String tmp = firstParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint);
+            String tmp2 = secondParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint);
             Individual firstChild = new Individual(firstParent,
                     firstParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint)
                             + secondParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint));
@@ -249,12 +238,12 @@ public class GeneticAlgorithm {
             Logic.fold(secondChild.getHpModel());
             Logic.evaluateFitness(firstChild);
             Logic.evaluateFitness(secondChild);
-            Double[] fitnessValues = new Double[2];
-            fitnessValues[0] = firstChild.getFitness();
-            fitnessValues[1] = secondChild.getFitness();
-            crossoverPointFitnessValueMap.put(crossoverPoint, fitnessValues);
+            Individual[] children = new Individual[2];
+            children[0] = firstChild;
+            children[1] = secondChild;
+            crossoverPointFitnessValueMap.put(crossoverPoint, children);
         }
-
+        return crossoverPointFitnessValueMap;
     }
 
     private static List<Individual> copyBestCrossover(Individual firstParent, Individual secondParent) {
@@ -268,6 +257,7 @@ public class GeneticAlgorithm {
         }
         return children;
     }
+
 
 
     private static void noMutate(Individual individual, double mutationRate) {

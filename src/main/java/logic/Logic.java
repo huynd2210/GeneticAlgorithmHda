@@ -71,7 +71,7 @@ public class Logic {
     Folding folding = hpModel.getFolding();
     //set first index of the amino acid chain
     hpModel.getProtein().getProteinChain().get(0).setIndex(0);
-    for (int i = 0; i < folding.getFoldingDirection().length(); i++) {
+    for (int i = 0; i < folding.getFoldingDirection().length() - 1; i++) {
       char direction = folding.getFoldingDirection().charAt(i);
       AminoAcid currentAminoAcid = hpModel.getProtein().getProteinChain().get(i + 1);
       AminoAcid previousAminoAcid = hpModel.getProtein().getProteinChain().get(i);

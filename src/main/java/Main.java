@@ -167,7 +167,9 @@ public class Main {
 
 
   public static void testFilterOverlapping(){
-    HPModel hpModel = new HPModel(new Protein(Examples.SEQ24), new Folding("ESSWNSWWNENWNWSWSSESWWNN"));
+    String foldingDirection = "EENWSES";
+    System.out.println(foldingDirection.length());
+    HPModel hpModel = new HPModel(new Protein(Examples.SEQ7), new Folding(foldingDirection));
     Logic.fold(hpModel);
     List<List<AminoAcid>> lists = Logic.filterForOverlappingAminoAcids(hpModel.getProtein().getProteinChain());
     System.out.println(lists);
