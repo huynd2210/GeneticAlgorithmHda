@@ -15,7 +15,7 @@ public class GeneticAlgorithm {
     private static final Random r = new Random();
     private static double MUTATION_RATE = 0.01;
     private static double FINAL_MUTATION_RATE = 0.003;
-    private static final int TOURNAMENT_SIZE = 6;
+    private static final int TOURNAMENT_SIZE = 12;
 
     private GeneticAlgorithm() {
 
