@@ -4,10 +4,11 @@ import model.Individual;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 public class GeneticAlgorithm {
-    private static final int POPULATION_SIZE = 200;
+    private static final int POPULATION_SIZE = 100;
     private static final int MAX_GENERATIONS = 100;
     private static final Random r = new Random();
     private static double MUTATION_RATE = 0.005;
@@ -65,7 +66,7 @@ public class GeneticAlgorithm {
 //            dataLine[10] = String.valueOf(calculatePopulationDiversity(currentPopulation));
             logs.add(dataLine);
 
-            currentPopulation = evolveNextGeneration(currentPopulation, i);
+            currentPopulation = evolveNextGeneration(currentPopulation, MUTATION_RATE);
         }
 //    return currentPopulation;
         Logger.write("data.csv", logs);
@@ -73,11 +74,7 @@ public class GeneticAlgorithm {
     }
 
     private static double findAverageFitnessOfPopulation(List<Individual> population) {
-        double averageFitness = 0;
-        for (Individual individual : population) {
-            averageFitness += individual.getFitness();
-        }
-        return averageFitness / population.size();
+        return population.stream().mapToDouble(Individual::getFitness).average().getAsDouble();
     }
 
     private static Individual findBestFitnessOfPopulation(List<Individual> population) {
@@ -92,10 +89,17 @@ public class GeneticAlgorithm {
 
     private static List<Individual> evolveNextGeneration(List<Individual> currentGenerationPopulation, double mutationRate) throws Exception {
         List<Individual> newPopulation = makeOffspring(currentGenerationPopulation);
+//        double before = findAverageFitnessOfPopulation(newPopulation);
+//        evaluatePopulationFitness(newPopulation);
+//        double after = findAverageFitnessOfPopulation(newPopulation);
         for (Individual individual : newPopulation) {
             mutate(individual, mutationRate);
 //            noMutate(individual, mutationRate);
         }
+//        evaluatePopulationFitness(newPopulation);
+//        double averageFitnessOfPopulation = findAverageFitnessOfPopulation(currentGenerationPopulation);
+//        double averageFitnessOfnewPopulation = findAverageFitnessOfPopulation(newPopulation);
+
         return newPopulation;
     }
 
@@ -104,6 +108,7 @@ public class GeneticAlgorithm {
             Logic.fold(individual.getHpModel());
             Logic.evaluateFitness(individual);
         }
+
     }
 
     private static List<Individual> makeOffspring(List<Individual> currentGenerationPopulation) throws Exception {
@@ -123,6 +128,12 @@ public class GeneticAlgorithm {
 //            nextGeneration.addAll(copyBestCrossover(firstParent, secondParent));
             nextGeneration.addAll(selectiveCrossover(firstParent, secondParent));
         }
+//        System.out.println("old gen fitness avg vs new gen avg: " +
+//                currentGenerationPopulation.stream().mapToDouble(Individual::getFitness).average().toString() + " vs " +
+//                nextGeneration.stream().mapToDouble(Individual::getFitness).average().toString());
+        double before = findAverageFitnessOfPopulation(nextGeneration);
+        evaluatePopulationFitness(nextGeneration);
+        double after = findAverageFitnessOfPopulation(nextGeneration);
         return nextGeneration;
     }
 
@@ -166,7 +177,6 @@ public class GeneticAlgorithm {
         for (Individual individual : population) {
             totalFitness += individual.getFitness();
         }
-
         //generate a random number in proportional to the total fitness
         //e.g population fitness is [4,2,3,1], total fitness is 10
         //the individual with a higher fitness is more likely to reduce the
@@ -199,7 +209,6 @@ public class GeneticAlgorithm {
         Logic.evaluateFitness(firstChild);
         Logic.evaluateFitness(secondChild);
 
-
         children.add(firstChild);
         children.add(secondChild);
         return children;
@@ -207,16 +216,8 @@ public class GeneticAlgorithm {
 
     private static List<Individual> selectiveCrossover(Individual firstParent, Individual secondParent){
         Map<Integer, Individual[]> children = evaluateAllOffspring(firstParent, secondParent);
-        OptionalDouble average = children.values().stream().mapToDouble(f -> (f[0].getFitness() + f[1].getFitness())/2).average();
-        System.out.println(average);
-
-        for (Individual[] value : children.values()) {
-            System.out.println(value[0].getFitness());
-            System.out.println(value[1].getFitness());
-        }
-
         List<Individual> sortedChildren = children.values().stream().flatMap(Arrays::stream).sorted(Comparator.comparing(Individual::getFitness)).collect(Collectors.toList());
-
+        Collections.reverse(sortedChildren);
         return sortedChildren.subList(1,3);
     }
 
@@ -276,6 +277,7 @@ public class GeneticAlgorithm {
         individual.getHpModel().getFolding().setFoldingDirection(sb.toString());
     }
 
+    //The choice of putting params here despite having global variables is intentional
     private static double getMutationRate(int currentGeneration, int maxGeneration, double initialRate, double finalRate) {
         return initialRate + (finalRate - initialRate) * currentGeneration / maxGeneration;
     }
