@@ -174,7 +174,7 @@ public class Logic {
 
   public static Integer hashPosition(Integer[] position){
     //cantor pairing function with offset for negative values
-    final int offset = 1000;
+    final int offset = 100;
     int i = position[0] + offset;
     int j = position[1] + offset;
       return (i + j) * (i + j + 1) / 2 + j;

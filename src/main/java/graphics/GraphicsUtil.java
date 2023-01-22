@@ -17,8 +17,8 @@ import java.util.List;
 public class GraphicsUtil {
   private int cellSize = 50;
   private int cellPadding = 50;
-  private int canvasHeight = 1000;
-  private int canvasWidth = 1500;
+  private int canvasHeight = 2000;
+  private int canvasWidth = 2000;
   private BufferedImage image;
   private Graphics2D g2;
   private final int labelOffsetI = 5;

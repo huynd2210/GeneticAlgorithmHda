@@ -8,14 +8,14 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 public class GeneticAlgorithm {
-    private static final int POPULATION_SIZE = 100;
-    private static final int MAX_GENERATIONS = 100;
+    private static final int POPULATION_SIZE = 700;
+    private static final int MAX_GENERATIONS = 700;
     private static boolean isRouletteSelection = true;
     private static boolean useDynamicMutationRate = true;
     private static final Random r = new Random();
-    private static double MUTATION_RATE = 0.005;
-    private static double FINAL_MUTATION_RATE = 0.005;
-    private static final int TOURNAMENT_SIZE = 3;
+    private static double MUTATION_RATE = 0.01;
+    private static double FINAL_MUTATION_RATE = 0.003;
+    private static final int TOURNAMENT_SIZE = 6;
 
     private GeneticAlgorithm() {
 
@@ -24,7 +24,7 @@ public class GeneticAlgorithm {
     public static Individual runGeneticAlgorithmWithConfig(Map<String, String> config) throws Exception {
         isRouletteSelection = Boolean.parseBoolean(config.get("isRouletteSelection"));
         useDynamicMutationRate = Boolean.parseBoolean(config.get("useDynamicMutationRate"));
-        if (useDynamicMutationRate){
+        if (!useDynamicMutationRate){
             FINAL_MUTATION_RATE = MUTATION_RATE;
         }
         return runGeneticAlgorithm(config.get("target"));
@@ -72,7 +72,7 @@ public class GeneticAlgorithm {
             dataLine[5] = Integer.toString(bestIndividual.getIndividualInformation().getOverlappingAminoAcids().size());
             dataLine[6] = currentMostFit.getHpModel().getFolding().getFoldingDirection();
             dataLine[7] = bestIndividual.getHpModel().getFolding().getFoldingDirection();
-            dataLine[8] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
+//            dataLine[8] = currentPopulation.stream().collect(StringBuilder::new, (sb, individual) -> sb.append(individual.toString()).append(";"), StringBuilder::append).toString();
             double mutationRate = getMutationRate(i, MAX_GENERATIONS, MUTATION_RATE, FINAL_MUTATION_RATE);
             dataLine[9] = String.valueOf(mutationRate);
 //            dataLine[10] = String.valueOf(calculatePopulationDiversity(currentPopulation));
