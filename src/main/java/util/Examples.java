@@ -1,3 +1,5 @@
+package util;
+
 public class Examples {
 	public static String SEQ20 = "10100110100101100101";
 	public static String SEQ24 = "110010010010010010010011";

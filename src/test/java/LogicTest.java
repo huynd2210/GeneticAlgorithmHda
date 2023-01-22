@@ -3,8 +3,8 @@ import model.AminoAcid;
 import model.Folding;
 import model.HPModel;
 import model.Protein;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import util.Examples;
 
 import java.util.List;
 

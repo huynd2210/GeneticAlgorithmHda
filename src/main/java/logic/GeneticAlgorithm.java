@@ -10,12 +10,24 @@ import java.util.stream.Stream;
 public class GeneticAlgorithm {
     private static final int POPULATION_SIZE = 100;
     private static final int MAX_GENERATIONS = 100;
+    private static boolean isRouletteSelection = true;
+    private static boolean useDynamicMutationRate = true;
     private static final Random r = new Random();
     private static double MUTATION_RATE = 0.005;
     private static double FINAL_MUTATION_RATE = 0.005;
+    private static final int TOURNAMENT_SIZE = 3;
 
     private GeneticAlgorithm() {
 
+    }
+
+    public static Individual runGeneticAlgorithmWithConfig(Map<String, String> config) throws Exception {
+        isRouletteSelection = Boolean.parseBoolean(config.get("isRouletteSelection"));
+        useDynamicMutationRate = Boolean.parseBoolean(config.get("useDynamicMutationRate"));
+        if (useDynamicMutationRate){
+            FINAL_MUTATION_RATE = MUTATION_RATE;
+        }
+        return runGeneticAlgorithm(config.get("target"));
     }
 
     public static Individual runGeneticAlgorithm(String targetProtein) throws Exception {
@@ -89,17 +101,10 @@ public class GeneticAlgorithm {
 
     private static List<Individual> evolveNextGeneration(List<Individual> currentGenerationPopulation, double mutationRate) throws Exception {
         List<Individual> newPopulation = makeOffspring(currentGenerationPopulation);
-//        double before = findAverageFitnessOfPopulation(newPopulation);
-//        evaluatePopulationFitness(newPopulation);
-//        double after = findAverageFitnessOfPopulation(newPopulation);
         for (Individual individual : newPopulation) {
             mutate(individual, mutationRate);
 //            noMutate(individual, mutationRate);
         }
-//        evaluatePopulationFitness(newPopulation);
-//        double averageFitnessOfPopulation = findAverageFitnessOfPopulation(currentGenerationPopulation);
-//        double averageFitnessOfnewPopulation = findAverageFitnessOfPopulation(newPopulation);
-
         return newPopulation;
     }
 
@@ -124,28 +129,24 @@ public class GeneticAlgorithm {
             Individual firstParent = selectedForReproduction.get(i);
             Individual secondParent = selectedForReproduction.get(i + 1);
 
-//            nextGeneration.addAll(crossover(firstParent, secondParent, 0));
+            nextGeneration.addAll(crossover(firstParent, secondParent));
 //            nextGeneration.addAll(copyBestCrossover(firstParent, secondParent));
-            nextGeneration.addAll(selectiveCrossover(firstParent, secondParent));
+//            nextGeneration.addAll(selectiveCrossover(firstParent, secondParent));
         }
-//        System.out.println("old gen fitness avg vs new gen avg: " +
-//                currentGenerationPopulation.stream().mapToDouble(Individual::getFitness).average().toString() + " vs " +
-//                nextGeneration.stream().mapToDouble(Individual::getFitness).average().toString());
-        double before = findAverageFitnessOfPopulation(nextGeneration);
-        evaluatePopulationFitness(nextGeneration);
-        double after = findAverageFitnessOfPopulation(nextGeneration);
         return nextGeneration;
     }
 
     private static List<Individual> selectForReproduction(List<Individual> currentGenerationPopulation) throws Exception {
         List<Individual> selectedForReproduction = new ArrayList<>();
         for (int i = 0; i < currentGenerationPopulation.size(); i++) {
-            selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
-//            selectedForReproduction.add(Collections.max(currentGenerationPopulation, Comparator.comparing(Individual::getFitness)));
+            if (isRouletteSelection){
+                selectedForReproduction.add(rouletteWheelSelectionAlt(currentGenerationPopulation));
+            }else{
+                selectedForReproduction.add(tournamentSelection(currentGenerationPopulation));
+            }
         }
         return selectedForReproduction;
     }
-
 
     private static Individual rouletteWheelSelectionAlt(List<Individual> population) throws Exception {
         double sumFitness = 0;
@@ -170,6 +171,22 @@ public class GeneticAlgorithm {
         }
         throw new Exception("Roulette wheel selection returns null");
 //        return null;
+    }
+
+    private static Individual tournamentSelection(List<Individual> population) {
+        int tournamentSize = TOURNAMENT_SIZE;
+        if (tournamentSize > population.size()){
+            tournamentSize = population.size();
+        }
+
+        List<Individual> tournamentPopulation = new ArrayList<>(tournamentSize);
+
+        for (int i = 0; i < tournamentSize; i++) {
+            int randomIndex = (int) (Math.random() * population.size());
+            tournamentPopulation.add(population.get(randomIndex));
+        }
+
+        return tournamentPopulation.stream().max(Comparator.comparingDouble(Individual::getFitness)).get();
     }
 
     private static Individual rouletteWheelSelection(List<Individual> population) {
@@ -227,8 +244,6 @@ public class GeneticAlgorithm {
         for (int i = 0; i < firstParent.getHpModel().getFolding().getFoldingDirection().length(); i++) {
             crossoverPoint = i;
 
-            String tmp = firstParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint);
-            String tmp2 = secondParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint);
             Individual firstChild = new Individual(firstParent,
                     firstParent.getHpModel().getFolding().getFoldingDirection().substring(0, crossoverPoint)
                             + secondParent.getHpModel().getFolding().getFoldingDirection().substring(crossoverPoint));
@@ -258,8 +273,6 @@ public class GeneticAlgorithm {
         }
         return children;
     }
-
-
 
     private static void noMutate(Individual individual, double mutationRate) {
         return;
@@ -300,25 +313,4 @@ public class GeneticAlgorithm {
         }
         return sb.toString();
     }
-
-//    private static int calculateSubstitutionDistance(Individual first, Individual second){
-//        int distance = 0;
-//        for (int i = 0; i < first.getHpModel().getFolding().getFoldingDirection().length(); i++) {
-//            if (first.getHpModel().getFolding().getFoldingDirection().charAt(i) != second.getHpModel().getFolding().getFoldingDirection().charAt(i)) {
-//                distance++;
-//            }
-//        }
-//        return distance;
-//    }
-//
-//    private static double calculatePopulationDiversity(List<Individual> population){
-//        double diversitySum = 0;
-//        for (int i = 0; i < population.size(); i++) {
-//            for (int j = i + 1; j < population.size(); j++) {
-//                int distance = calculateSubstitutionDistance(population.get(i), population.get(j));
-//                diversitySum += distance;
-//            }
-//        }
-//        return diversitySum / (population.size() * (population.size() - 1) / 2);
-//    }
 }

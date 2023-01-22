@@ -2,21 +2,12 @@ import logic.GeneticAlgorithm;
 import logic.Logic;
 import model.*;
 import graphics.GraphicsUtil;
-import org.apache.commons.math3.util.CombinatoricsUtils;
+import util.Console;
+import util.Examples;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 public class Main {
   public static void runGA(String proteinSequence) throws Exception {
@@ -82,78 +73,8 @@ public class Main {
     test(Examples.SEQ7, "NWSWNNE");
   }
 
-  public static void runGraphicExample() {
-
-    int height = 500;
-    int width = 800;
-
-    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    Graphics2D g2 = image.createGraphics();
-    g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-    g2.setColor(Color.YELLOW);
-    g2.fillRect(0, 0, width, height);
-
-    int cellSize = 50;
-
-    g2.setColor(new Color(0, 200, 0));
-    g2.fillRect(50, 50, cellSize, cellSize);
-
-    g2.setColor(new Color(255, 0, 0));
-    g2.fillRect(250, 50, cellSize, cellSize);
-
-    g2.setColor(Color.BLACK);
-    g2.drawLine(50 + cellSize, 50 + cellSize / 2, 250, 50 + cellSize / 2);
-
-    g2.setColor(new Color(255, 255, 255));
-    String label = "GA";
-    Font font = new Font("Serif", Font.PLAIN, 40);
-    g2.setFont(font);
-    FontMetrics metrics = g2.getFontMetrics();
-    int ascent = metrics.getAscent();
-    int labelWidth = metrics.stringWidth(label);
-
-    g2.drawString(label, 50 + cellSize / 2 - labelWidth / 2, 50 + cellSize / 2 + ascent / 2);
-
-    String folder = ".";
-    String filename = "sample graphic.png";
-    if (!new File(folder).exists()) new File(folder).mkdirs();
-
-    try {
-      ImageIO.write(image, "png", new File(folder + File.separator + filename));
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.exit(0);
-    }
-
-
-  }
-
   public static void main(String[] args) throws Exception {
-//    testIndividualCopyCorrectness();
-
-
-//    Individual a = new Individual(Examples.SEQ24, "SSWNSENNSESSENSEWSENNNW");
-//    Individual b = new Individual(Examples.SEQ24, "SSWNSENNSESSENSEWWEESSN");
-//    Logic.fold(a.getHpModel());
-//    Logic.fold(b.getHpModel());
-//    Logic.evaluateFitness(a);
-//    Logic.evaluateFitness(b);
-//
-//    System.out.println("sads");
-
-    testGA();
-//    testFilterOverlapping();
-//    testNoOverlapping();
-//    testOverlapping();
-//    testHashing();
-//    runGraphicExample();
-
-//    testSampleOverlapping();
-//    runGA(Examples.SEQ24);
-//    System.out.println(CombinatoricsUtils.binomialCoefficient(5, 2));
-
-
+    Console.runMainConsole();
   }
 
   private static void testIndividualCopyCorrectness() throws Exception {
@@ -164,7 +85,6 @@ public class Main {
     System.out.println(tmp);
     System.out.println("asdjsd");
   }
-
 
   public static void testFilterOverlapping(){
     String foldingDirection = "EENWSES";
